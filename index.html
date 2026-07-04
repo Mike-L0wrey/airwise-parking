@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Airwise Parking – Heathrow Airport Parking</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy: #0B1E3D;
+      --navy-mid: #122A52;
+      --sky: #3B9EE8;
+      --sky-light: #EBF5FD;
+      --white: #FFFFFF;
+      --slate: #6B7A8D;
+      --slate-light: #F5F7FA;
+      --border: #DDE3EC;
+      --green: #1DB87A;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      color: var(--navy);
+      background: var(--white);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ─── NAV ─── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 48px;
+      background: rgba(11, 30, 61, 0.92);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    .logo {
+      font-family: 'Sora', sans-serif;
+      font-weight: 700;
+      font-size: 1.25rem;
+      color: var(--white);
+      letter-spacing: -0.02em;
+    }
+
+    .logo span { color: var(--sky); }
+
+    nav a {
+      color: rgba(255,255,255,0.75);
+      text-decoration: none;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+    nav a:hover { color: var(--white); }
+
+    .nav-links { display: flex; gap: 32px; align-items: center; }
+
+    .nav-cta {
+      background: var(--sky);
+      color: var(--white) !important;
+      padding: 9px 20px;
+      border-radius: 6px;
+      font-weight: 600 !important;
+    }
+    .nav-cta:hover { background: #2d8dd4 !important; }
+
+    /* ─── HERO ─── */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      background: var(--navy);
+      padding: 120px 24px 80px;
+    }
+
+    /* Layered sky-to-runway gradient */
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 50% 0%, rgba(59,158,232,0.18) 0%, transparent 70%),
+        radial-gradient(ellipse 60% 40% at 80% 80%, rgba(59,158,232,0.10) 0%, transparent 60%),
+        linear-gradient(160deg, #0B1E3D 0%, #0f2545 50%, #0B1E3D 100%);
+    }
+
+    /* Subtle runway grid lines */
+    .hero::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(59,158,232,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(59,158,232,0.04) 1px, transparent 1px);
+      background-size: 60px 60px;
+      mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.6) 40%, rgba(0,0,0,0.6) 70%, transparent 100%);
+    }
+
+    .hero-inner {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      max-width: 1100px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 64px;
+      align-items: center;
+    }
+
+    .hero-text h1 {
+      font-family: 'Sora', sans-serif;
+      font-size: clamp(2.2rem, 4vw, 3.4rem);
+      font-weight: 700;
+      color: var(--white);
+      line-height: 1.15;
+      letter-spacing: -0.03em;
+      margin-bottom: 20px;
+    }
+
+    .hero-text h1 em {
+      font-style: normal;
+      color: var(--sky);
+    }
+
+    .hero-text p {
+      font-size: 1.05rem;
+      color: rgba(255,255,255,0.68);
+      line-height: 1.7;
+      max-width: 420px;
+      margin-bottom: 32px;
+    }
+
+    .hero-badges {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: rgba(255,255,255,0.7);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .badge-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--green);
+      flex-shrink: 0;
+    }
+
+    /* ─── BOOKING WIDGET ─── */
+    .booking-card {
+      background: rgba(255,255,255,0.97);
+      backdrop-filter: blur(20px);
+      border-radius: 16px;
+      padding: 36px 32px;
+      box-shadow:
+        0 2px 4px rgba(0,0,0,0.06),
+        0 8px 24px rgba(0,0,0,0.15),
+        0 32px 64px rgba(0,0,0,0.18);
+    }
+
+    .booking-card h2 {
+      font-family: 'Sora', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--navy);
+      margin-bottom: 6px;
+      letter-spacing: -0.02em;
+    }
+
+    .booking-card .sub {
+      font-size: 0.85rem;
+      color: var(--slate);
+      margin-bottom: 28px;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .form-row.full { grid-template-columns: 1fr; }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .field label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--slate);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .field input, .field select {
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      padding: 11px 13px;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.9rem;
+      color: var(--navy);
+      background: var(--white);
+      transition: border-color 0.2s, box-shadow 0.2s;
+      outline: none;
+      width: 100%;
+    }
+
+    .field input:focus, .field select:focus {
+      border-color: var(--sky);
+      box-shadow: 0 0 0 3px rgba(59,158,232,0.12);
+    }
+
+    .field input::placeholder { color: #B0BEC8; }
+
+    .submit-btn {
+      width: 100%;
+      background: var(--sky);
+      color: var(--white);
+      border: none;
+      border-radius: 8px;
+      padding: 15px;
+      font-family: 'Sora', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 16px;
+      transition: background 0.2s, transform 0.1s;
+      letter-spacing: -0.01em;
+    }
+
+    .submit-btn:hover { background: #2d8dd4; }
+    .submit-btn:active { transform: scale(0.99); }
+
+    .privacy-note {
+      text-align: center;
+      font-size: 0.73rem;
+      color: #9AA5B1;
+      margin-top: 12px;
+    }
+
+    /* ─── SUCCESS MESSAGE ─── */
+    .success-msg {
+      display: none;
+      text-align: center;
+      padding: 24px 0;
+    }
+    .success-msg .tick {
+      font-size: 2.5rem;
+      margin-bottom: 12px;
+    }
+    .success-msg h3 {
+      font-family: 'Sora', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--navy);
+      margin-bottom: 8px;
+    }
+    .success-msg p {
+      font-size: 0.875rem;
+      color: var(--slate);
+    }
+
+    /* ─── HOW IT WORKS ─── */
+    .section { padding: 96px 24px; }
+    .section-inner { max-width: 1100px; margin: 0 auto; }
+
+    .section-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--sky);
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      font-family: 'Sora', sans-serif;
+      font-size: clamp(1.8rem, 3vw, 2.6rem);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      color: var(--navy);
+      margin-bottom: 16px;
+    }
+
+    .section-sub {
+      font-size: 1rem;
+      color: var(--slate);
+      line-height: 1.7;
+      max-width: 520px;
+      margin-bottom: 56px;
+    }
+
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 40px;
+    }
+
+    .step {
+      position: relative;
+    }
+
+    .step-num {
+      font-family: 'Sora', sans-serif;
+      font-size: 3rem;
+      font-weight: 700;
+      color: var(--sky-light);
+      line-height: 1;
+      margin-bottom: 16px;
+      letter-spacing: -0.04em;
+    }
+
+    .step-icon {
+      font-size: 1.6rem;
+      margin-bottom: 14px;
+    }
+
+    .step h3 {
+      font-family: 'Sora', sans-serif;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--navy);
+      margin-bottom: 8px;
+      letter-spacing: -0.02em;
+    }
+
+    .step p {
+      font-size: 0.9rem;
+      color: var(--slate);
+      line-height: 1.7;
+    }
+
+    /* Connecting line */
+    .steps-wrap {
+      position: relative;
+    }
+    .steps-wrap::before {
+      content: '';
+      position: absolute;
+      top: 48px;
+      left: calc(33.33% - 10px);
+      right: calc(33.33% - 10px);
+      height: 1px;
+      background: linear-gradient(90deg, var(--sky) 0%, var(--border) 100%);
+      pointer-events: none;
+    }
+
+    /* ─── TRUST ─── */
+    .trust { background: var(--slate-light); }
+
+    .trust-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+    }
+
+    .trust-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 28px 24px;
+    }
+
+    .trust-card .icon {
+      font-size: 1.5rem;
+      margin-bottom: 12px;
+    }
+
+    .trust-card h4 {
+      font-family: 'Sora', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--navy);
+      margin-bottom: 6px;
+      letter-spacing: -0.02em;
+    }
+
+    .trust-card p {
+      font-size: 0.82rem;
+      color: var(--slate);
+      line-height: 1.6;
+    }
+
+    /* ─── PRICING BAND ─── */
+    .pricing-band {
+      background: var(--navy);
+      padding: 64px 24px;
+      text-align: center;
+    }
+
+    .pricing-band .section-title { color: var(--white); }
+    .pricing-band .section-sub { color: rgba(255,255,255,0.6); margin: 0 auto 40px; }
+
+    .price-tag {
+      display: inline-block;
+      background: var(--sky);
+      color: var(--white);
+      font-family: 'Sora', sans-serif;
+      font-size: 2.4rem;
+      font-weight: 700;
+      padding: 16px 40px;
+      border-radius: 12px;
+      letter-spacing: -0.03em;
+      margin-bottom: 12px;
+    }
+
+    .price-note {
+      font-size: 0.82rem;
+      color: rgba(255,255,255,0.5);
+    }
+
+    /* ─── BOTTOM FORM ─── */
+    .bottom-form { background: var(--slate-light); }
+
+    .bottom-form-wrap {
+      max-width: 640px;
+      margin: 0 auto;
+      background: var(--white);
+      border-radius: 16px;
+      padding: 48px;
+      border: 1px solid var(--border);
+    }
+
+    .bottom-form-wrap h2 {
+      font-family: 'Sora', sans-serif;
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--navy);
+      letter-spacing: -0.03em;
+      margin-bottom: 8px;
+    }
+
+    .bottom-form-wrap .sub {
+      color: var(--slate);
+      font-size: 0.9rem;
+      margin-bottom: 32px;
+    }
+
+    /* ─── FOOTER ─── */
+    footer {
+      background: var(--navy);
+      padding: 40px 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    footer .logo { font-size: 1rem; }
+
+    footer p {
+      font-size: 0.78rem;
+      color: rgba(255,255,255,0.35);
+    }
+
+    footer a {
+      font-size: 0.78rem;
+      color: rgba(255,255,255,0.4);
+      text-decoration: none;
+    }
+    footer a:hover { color: rgba(255,255,255,0.7); }
+
+    .footer-links { display: flex; gap: 24px; }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 900px) {
+      nav { padding: 16px 24px; }
+      .nav-links .nav-text { display: none; }
+
+      .hero-inner {
+        grid-template-columns: 1fr;
+        gap: 40px;
+        text-align: center;
+      }
+      .hero-text p { max-width: 100%; }
+      .hero-badges { justify-content: center; }
+
+      .steps { grid-template-columns: 1fr; gap: 32px; }
+      .steps-wrap::before { display: none; }
+      .trust-grid { grid-template-columns: 1fr 1fr; }
+
+      footer { flex-direction: column; gap: 16px; text-align: center; }
+      .bottom-form-wrap { padding: 32px 24px; }
+    }
+
+    @media (max-width: 540px) {
+      .trust-grid { grid-template-columns: 1fr; }
+      .form-row { grid-template-columns: 1fr; }
+      .booking-card { padding: 28px 20px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * { transition: none !important; animation: none !important; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">Air<span>wise</span></div>
+  <div class="nav-links">
+    <a href="#how-it-works" class="nav-text">How it works</a>
+    <a href="#pricing" class="nav-text">Pricing</a>
+    <a href="quote.html" class="nav-text">Get a quote</a>
+    <a href="#book" class="nav-cta">Book parking</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="home">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <h1>Heathrow parking,<br /><em>sorted before you fly.</em></h1>
+      <p>Secure, affordable off-airport parking near Heathrow. Free transfer to your terminal. No stress, no surprises — just a smooth start to your trip.</p>
+      <div class="hero-badges">
+        <span class="badge"><span class="badge-dot"></span>Free transfer included</span>
+        <span class="badge"><span class="badge-dot"></span>All terminals covered</span>
+        <span class="badge"><span class="badge-dot"></span>No hidden fees</span>
+      </div>
+    </div>
+
+    <!-- BOOKING WIDGET -->
+    <div class="booking-card" id="book">
+      <h2>Get a quick quote</h2>
+      <p class="sub">Tell us your dates and we'll be in touch within the hour.</p>
+      <div id="booking-form">
+        <div class="form-row full">
+          <div class="field">
+            <label>Your name</label>
+            <input type="text" placeholder="e.g. James Wilson" id="name" />
+          </div>
+        </div>
+        <div class="form-row full">
+          <div class="field">
+            <label>Phone number</label>
+            <input type="tel" placeholder="07700 900 000" id="phone" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="field">
+            <label>Drop-off date</label>
+            <input type="date" id="dropoff" />
+          </div>
+          <div class="field">
+            <label>Pick-up date</label>
+            <input type="date" id="pickup" />
+          </div>
+        </div>
+        <div class="form-row full">
+          <div class="field">
+            <label>Terminal</label>
+            <select id="terminal">
+              <option value="">Select your terminal</option>
+              <option>Terminal 2</option>
+              <option>Terminal 3</option>
+              <option>Terminal 4</option>
+              <option>Terminal 5</option>
+              <option>Not sure yet</option>
+            </select>
+          </div>
+        </div>
+        <button class="submit-btn" onclick="submitForm()">Get my quote →</button>
+        <p class="privacy-note">🔒 Your details are kept private and never shared.</p>
+      </div>
+      <div class="success-msg" id="success">
+        <div class="tick">✅</div>
+        <h3>Thanks! We'll call you shortly.</h3>
+        <p>One of our team will be in touch within the hour to confirm your booking and take payment.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="section" id="how-it-works">
+  <div class="section-inner">
+    <div class="section-label">Simple process</div>
+    <h2 class="section-title">Three steps to sorted</h2>
+    <p class="section-sub">No apps to download, no confusing portals. Just a quick enquiry and we handle everything from there.</p>
+    <div class="steps-wrap">
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">01</div>
+          <div class="step-icon">📋</div>
+          <h3>Tell us your dates</h3>
+          <p>Fill in the short form above with your name, number, and travel dates. Takes less than a minute.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">02</div>
+          <div class="step-icon">📞</div>
+          <h3>We confirm your spot</h3>
+          <p>We'll call you within the hour, confirm availability, give you our best price, and take payment securely.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">03</div>
+          <div class="step-icon">🚗</div>
+          <h3>Drop off and fly</h3>
+          <p>Arrive at our secure site near Heathrow. We transfer you to your terminal — and collect you on the way back.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TRUST SIGNALS -->
+<section class="section trust">
+  <div class="section-inner">
+    <div class="section-label">Why choose Airwise</div>
+    <h2 class="section-title">Parking you can actually trust</h2>
+    <p class="section-sub">We do one thing — off-airport Heathrow parking — and we do it properly.</p>
+    <div class="trust-grid">
+      <div class="trust-card">
+        <div class="icon">🔒</div>
+        <h4>Secure, managed site</h4>
+        <p>CCTV monitored, fenced compound. Your car is safe the whole time you're away.</p>
+      </div>
+      <div class="trust-card">
+        <div class="icon">🚐</div>
+        <h4>Free terminal transfers</h4>
+        <p>We drop you to your terminal and collect you on return. No waiting around.</p>
+      </div>
+      <div class="trust-card">
+        <div class="icon">💷</div>
+        <h4>Transparent pricing</h4>
+        <p>The price we quote is the price you pay. No fuel surcharges, no surprise extras.</p>
+      </div>
+      <div class="trust-card">
+        <div class="icon">📱</div>
+        <h4>Personal service</h4>
+        <p>A real person answers your call. We're a local team, not a call centre.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING BAND -->
+<section class="pricing-band" id="pricing">
+  <div class="section-inner">
+    <div class="section-label" style="color: rgba(255,255,255,0.5);">Pricing</div>
+    <h2 class="section-title">From <span style="color:var(--sky)">£5 per day</span></h2>
+    <p class="section-sub">Rates vary by date and duration — contact us for your exact quote. We're consistently cheaper than airport car parks.</p>
+    <a href="#book" class="submit-btn" style="display:inline-block; width:auto; padding: 15px 36px; text-decoration:none; font-family:'Sora',sans-serif; font-weight:700; font-size:1rem; background:var(--sky); color:var(--white); border-radius:8px;">Check availability →</a>
+    <a href="quote.html" style="display:inline-block; margin-left:16px; padding: 15px 36px; text-decoration:none; font-family:'Sora',sans-serif; font-weight:700; font-size:1rem; color:var(--white); border:1.5px solid rgba(255,255,255,0.3); border-radius:8px;">Get instant price →</a>
+  </div>
+</section>
+
+<!-- BOTTOM FORM -->
+<section class="section bottom-form">
+  <div class="section-inner">
+    <div class="bottom-form-wrap">
+      <h2>Ready to book?</h2>
+      <p class="sub">Leave your details and we'll call you to confirm everything.</p>
+      <div id="booking-form-2">
+        <div class="form-row full">
+          <div class="field">
+            <label>Your name</label>
+            <input type="text" placeholder="e.g. Sarah Ahmed" id="name2" />
+          </div>
+        </div>
+        <div class="form-row full">
+          <div class="field">
+            <label>Phone number</label>
+            <input type="tel" placeholder="07700 900 000" id="phone2" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="field">
+            <label>Drop-off date</label>
+            <input type="date" id="dropoff2" />
+          </div>
+          <div class="field">
+            <label>Pick-up date</label>
+            <input type="date" id="pickup2" />
+          </div>
+        </div>
+        <div class="form-row full">
+          <div class="field">
+            <label>Terminal</label>
+            <select id="terminal2">
+              <option value="">Select your terminal</option>
+              <option>Terminal 2</option>
+              <option>Terminal 3</option>
+              <option>Terminal 4</option>
+              <option>Terminal 5</option>
+              <option>Not sure yet</option>
+            </select>
+          </div>
+        </div>
+        <button class="submit-btn" onclick="submitForm2()">Get my quote →</button>
+        <p class="privacy-note">🔒 Your details are kept private and never shared.</p>
+      </div>
+      <div class="success-msg" id="success2">
+        <div class="tick">✅</div>
+        <h3>Thanks! We'll call you shortly.</h3>
+        <p>One of our team will be in touch within the hour to confirm your booking and take payment.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="logo">Air<span>wise</span></div>
+  <p>© 2025 Airwise Parking Ltd · Serving Heathrow Airport</p>
+  <div class="footer-links">
+    <a href="#">Privacy policy</a>
+    <a href="#">Terms</a>
+    <a href="mailto:hello@airwiseparking.co.uk">Contact</a>
+  </div>
+</footer>
+
+<script>
+  function submitForm() {
+    const name = document.getElementById('name').value.trim();
+    const phone = document.getElementById('phone').value.trim();
+    const dropoff = document.getElementById('dropoff').value;
+    const pickup = document.getElementById('pickup').value;
+
+    if (!name || !phone || !dropoff || !pickup) {
+      alert('Please fill in your name, phone number, and travel dates.');
+      return;
+    }
+
+    document.getElementById('booking-form').style.display = 'none';
+    document.getElementById('success').style.display = 'block';
+
+    // TODO: replace with real form submission (e.g. Formspree, EmailJS, or your own endpoint)
+    console.log('Lead captured:', { name, phone, dropoff, pickup,
+      terminal: document.getElementById('terminal').value });
+  }
+
+  function submitForm2() {
+    const name = document.getElementById('name2').value.trim();
+    const phone = document.getElementById('phone2').value.trim();
+    const dropoff = document.getElementById('dropoff2').value;
+    const pickup = document.getElementById('pickup2').value;
+
+    if (!name || !phone || !dropoff || !pickup) {
+      alert('Please fill in your name, phone number, and travel dates.');
+      return;
+    }
+
+    document.getElementById('booking-form-2').style.display = 'none';
+    document.getElementById('success2').style.display = 'block';
+
+    console.log('Lead captured:', { name, phone, dropoff, pickup,
+      terminal: document.getElementById('terminal2').value });
+  }
+
+  // Set min date to today for date inputs
+  const today = new Date().toISOString().split('T')[0];
+  ['dropoff','pickup','dropoff2','pickup2'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.min = today;
+  });
+</script>
+
+</body>
+</html>

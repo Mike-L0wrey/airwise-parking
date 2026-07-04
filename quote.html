@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Get a Quote | Airwise Parking</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --navy: #0B1E3D;
+    --navy-mid: #122A52;
+    --sky: #3B9EE8;
+    --sky-light: #EBF5FD;
+    --white: #FFFFFF;
+    --slate: #6B7A8D;
+    --slate-light: #F5F7FA;
+    --border: #DDE3EC;
+    --green: #1DB87A;
+    --red: #C0392B;
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    color: var(--navy);
+    background: var(--slate-light);
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+  }
+
+  nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 48px;
+    background: var(--navy);
+  }
+  .logo { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 1.25rem; color: var(--white); }
+  .logo span { color: var(--sky); }
+  nav a { color: rgba(255,255,255,0.75); text-decoration: none; font-size: 0.875rem; font-weight: 500; }
+  nav a:hover { color: var(--white); }
+
+  .wrap {
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 56px 24px 80px;
+  }
+
+  .eyebrow {
+    text-align: center;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--sky);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 8px;
+  }
+
+  h1 {
+    font-family: 'Sora', sans-serif;
+    font-size: 1.75rem;
+    font-weight: 700;
+    text-align: center;
+    letter-spacing: -0.02em;
+    margin-bottom: 8px;
+  }
+
+  .sub {
+    text-align: center;
+    color: var(--slate);
+    font-size: 0.9rem;
+    margin-bottom: 32px;
+  }
+
+  .card {
+    background: var(--white);
+    border-radius: 16px;
+    padding: 32px 28px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.04), 0 12px 32px rgba(11,30,61,0.08);
+  }
+
+  label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--slate);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin: 18px 0 6px;
+  }
+  label:first-of-type { margin-top: 0; }
+
+  select, input[type="date"], input[type="number"] {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 8px;
+    border: 1.5px solid var(--border);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem;
+    color: var(--navy);
+    background: var(--white);
+    outline: none;
+  }
+  select:focus, input:focus {
+    border-color: var(--sky);
+    box-shadow: 0 0 0 3px rgba(59,158,232,0.12);
+  }
+
+  button {
+    width: 100%;
+    margin-top: 24px;
+    padding: 15px;
+    border: none;
+    border-radius: 8px;
+    background: var(--sky);
+    color: var(--white);
+    font-family: 'Sora', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  button:hover { background: #2d8dd4; }
+
+  .result { margin-top: 20px; padding: 20px; border-radius: 10px; display: none; }
+  .result.show { display: block; }
+  .result.ok { background: var(--sky-light); border: 1.5px solid #BFE0F7; }
+  .result.err { background: #FBEAE8; border: 1.5px solid #F0BDB6; }
+
+  .price-note { font-size: 0.75rem; color: var(--slate); }
+  .price {
+    font-family: 'Sora', sans-serif;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--navy);
+    margin: 4px 0 2px;
+  }
+  .err-text { font-size: 0.875rem; color: var(--red); line-height: 1.5; }
+
+  .disclaimer {
+    text-align: center;
+    font-size: 0.75rem;
+    color: var(--slate);
+    margin-top: 18px;
+    line-height: 1.5;
+  }
+
+  .footer-note {
+    text-align: center;
+    margin-top: 28px;
+    font-size: 0.85rem;
+    color: var(--slate);
+  }
+  .footer-note a { color: var(--sky); text-decoration: none; font-weight: 600; }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="logo">Air<span>wise</span></a>
+  <a href="index.html">← Back to home</a>
+</nav>
+
+<div class="wrap">
+  <div class="eyebrow">Instant pricing</div>
+  <h1>Get your parking price</h1>
+  <p class="sub">Select your terminal and dates for an instant quote.</p>
+
+  <div class="card">
+    <label for="terminal">Terminal</label>
+    <select id="terminal">
+      <option value="235">Terminal 2</option>
+      <option value="235">Terminal 3</option>
+      <option value="4">Terminal 4</option>
+      <option value="235">Terminal 5</option>
+    </select>
+
+    <label for="dropoff">Drop-off date</label>
+    <input type="date" id="dropoff" />
+
+    <label for="days">Number of days</label>
+    <input type="number" id="days" min="1" max="30" value="7" />
+
+    <button id="calcBtn" type="button">Get my price</button>
+
+    <div id="result" class="result">
+      <div id="resultOk" style="display:none;">
+        <div class="price-note">Estimated total price</div>
+        <div class="price" id="priceOut">£0</div>
+        <div class="price-note">Fully inclusive — no hidden fees.</div>
+      </div>
+      <div id="resultErr" class="err-text" style="display:none;"></div>
+    </div>
+
+    <p class="disclaimer">Prices shown are estimates based on current rates and may change. Final price is confirmed when your booking is placed.</p>
+  </div>
+
+  <p class="footer-note">
+    Prefer to talk? Call <a href="tel:02045690803">02045690803</a> or
+    <a href="index.html#book">request a callback</a>
+  </p>
+</div>
+
+<script>
+// ---- Real rate data (per band, price by number of days) ----
+// Bands beyond the listed range are not guessed — the customer is asked to contact us instead.
+const RATES = {
+  E1: [80,110,130,145,160,180,205,220,240,270,285,295,310,325,340], // max 15 days
+  E3: [60,85,100,110,120,130,155,170,180,190,210,220,230,240,245,255,265,275,285,295,305,315,325,335,345,355,365,375,385,395],
+  E4: [50,65,75,80,85,85,90,95,99,105,110,125,130,140,145,160,170,180,190,195,205,215,225,235,245,255,265,275,285,295],
+  E5: [65,75,90,100,100,105,110,110,110,120,130,140,150,160,175,185,195,200,210,220,230,240,250,260,270,280,290,300,310,310],
+  E8: [65,75,85,90,100,110,120,130,140,150,170,180,190,210,225,230,235,240,245,255,265,275,285,295,310,320,330,340,350,360],
+  E9: [47,55,60,65,70,75,80,85,90,93,95,100,102,110,130,140,150,160,170,180,190,200,210,220,230,240,250,260,270,280],
+  E6: [60,85,100,110,120,130,145,155,170,180,190,200,200,210,220,230,240,240,250,260,270,280,290,300,310,320,330,340,350,350]
+};
+
+// ---- Band calendars: [day-of-month index 0-30][month index 0-11] = band code ----
+// Terminals 2, 3 & 5 share one calendar. Terminal 4 has its own.
+const T235_CALENDAR = [["E9","E9","E9","E9","E9","E9","E9","E5","E9","E9","E9","E4"],["E9","E9","E9","E9","E9","E9","E9","E5","E9","E9","E9","E4"],["E9","E9","E9","E9","E9","E9","E9","E5","E9","E9","E9","E4"],["E9","E9","E9","E9","E9","E9","E9","E5","E9","E9","E9","E4"],["E9","E9","E9","E9","E9","E9","E9","E5","E9","E9","E9","E4"],["E9","E9","E9","E9","E9","E9","E9","E5","E9","E9","E9","E4"],["E9","E9","E9","E9","E9","E9","E9","E5","E9","E9","E9","E4"],["E9","E9","E9","E9","E9","E9","E9","E5","E9","E9","E9","E4"],["E9","E9","E9","E9","E9","E9","E9","E5","E9","E9","E9","E4"],["E9","E9","E9","E9","E9","E9","E9","E5","E9","E9","E9","E4"],["E9","E9","E9","E9","E9","E9","E9","E5","E9","E9","E9","E4"],["E9","E9","E9","E9","E9","E9","E9","E5","E9","E9","E9","E4"],["E9","E9","E9","E9","E9","E9","E9","E5","E9","E9","E9","E4"],["E9","E9","E9","E9","E9","E9","E9","E5","E9","E9","E9","E4"],["E9","E9","E9","E9","E9","E9","E9","E5","E9","E9","E9","E4"],["E9","E9","E9","E9","E9","E9","E9","E5","E9","E9","E9","E5"],["E9","E9","E9","E9","E9","E9","E9","E5","E9","E5","E9","E5"],["E9","E9","E9","E9","E9","E9","E9","E5","E9","E5","E9","E5"],["E9","E9","E9","E9","E9","E9","E9","E5","E9","E5","E9","E5"],["E9","E9","E9","E9","E9","E9","E9","E4","E9","E5","E9","E5"],["E9","E9","E9","E9","E9","E9","E9","E4","E9","E5","E9","E5"],["E9","E9","E9","E9","E9","E9","E9","E4","E9","E5","E9","E5"],["E9","E9","E9","E9","E9","E9","E9","E4","E9","E5","E9","E5"],["E9","E9","E9","E9","E9","E9","E5","E4","E9","E5","E9","E5"],["E9","E9","E9","E9","E9","E9","E5","E4","E9","E5","E9","E1"],["E9","E9","E9","E9","E9","E9","E5","E4","E9","E5","E9","E8"],["E9","E9","E9","E9","E9","E9","E5","E4","E9","E5","E9","E8"],["E9","E9","E9","E9","E9","E9","E5","E4","E9","E5","E9","E8"],["E9","E9","E9","E9","E9","E9","E5","E4","E9","E5","E9","E8"],["E9",null,"E9","E9","E9","E9","E5","E4","E9","E5","E9","E8"],["E9",null,"E9","E9","E9","E9","E5","E4",null,"E5",null,"E8"]];
+
+const T4_CALENDAR = [["E9","E4","E4","E8","E4","E4","E9","E8","E8","E8","E4","E5"],["E9","E4","E4","E8","E4","E4","E9","E8","E8","E8","E4","E5"],["E9","E4","E4","E8","E4","E4","E9","E8","E8","E8","E4","E5"],["E9","E4","E4","E8","E4","E4","E9","E8","E8","E8","E4","E5"],["E9","E4","E4","E8","E4","E4","E9","E8","E8","E8","E4","E5"],["E9","E4","E4","E8","E4","E4","E9","E8","E8","E8","E4","E5"],["E9","E4","E4","E8","E4","E4","E9","E8","E8","E8","E4","E5"],["E9","E4","E4","E8","E4","E4","E9","E8","E8","E8","E4","E5"],["E9","E4","E4","E8","E4","E4","E9","E8","E8","E8","E4","E5"],["E9","E8","E4","E8","E4","E4","E9","E8","E8","E8","E4","E5"],["E9","E8","E4","E8","E4","E4","E9","E8","E8","E8","E4","E5"],["E9","E8","E4","E8","E4","E4","E9","E8","E8","E8","E4","E5"],["E9","E8","E4","E8","E4","E4","E9","E8","E8","E8","E4","E5"],["E9","E8","E4","E8","E4","E4","E9","E8","E8","E8","E4","E5"],["E9","E8","E4","E8","E4","E4","E9","E8","E8","E8","E4","E5"],["E9","E8","E4","E8","E4","E4","E9","E8","E8","E8","E4","E5"],["E9","E8","E4","E8","E4","E4","E9","E8","E8","E8","E4","E5"],["E9","E8","E4","E8","E4","E4","E9","E8","E8","E8","E4","E5"],["E9","E8","E4","E8","E4","E4","E9","E8","E8","E8","E4","E5"],["E9","E4","E4","E8","E4","E4","E9","E8","E8","E8","E4","E5"],["E9","E4","E4","E8","E4","E4","E9","E8","E8","E8","E4","E5"],["E9","E4","E4","E8","E4","E4","E9","E8","E8","E8","E4","E5"],["E9","E4","E4","E8","E4","E4","E9","E8","E8","E8","E4","E5"],["E9","E4","E4","E8","E4","E4","E8","E8","E8","E8","E4","E5"],["E9","E4","E4","E8","E4","E4","E8","E8","E8","E8","E4","E8"],["E9","E4","E4","E8","E4","E4","E8","E8","E8","E8","E4","E8"],["E9","E4","E4","E8","E4","E4","E8","E8","E8","E8","E4","E8"],["E9","E4","E4","E8","E4","E4","E8","E8","E8","E8","E4","E8"],["E9","E4","E4","E8","E4","E4","E8","E8","E8","E8","E4","E8"],["E9",null,"E4","E8","E4","E4","E8","E8","E8","E8","E4","E8"],["E9",null,"E4","E8","E4","E4","E8","E8",null,"E8",null,"E8"]];
+
+function getBand(dateObj, terminalGroup) {
+  const day = dateObj.getDate() - 1;
+  const month = dateObj.getMonth();
+  const calendar = terminalGroup === "4" ? T4_CALENDAR : T235_CALENDAR;
+  if (!calendar[day]) return null;
+  return calendar[day][month] || null;
+}
+
+function calculate() {
+  const terminal = document.getElementById("terminal").value;
+  const dropoffVal = document.getElementById("dropoff").value;
+  const days = parseInt(document.getElementById("days").value, 10);
+
+  const resultBox = document.getElementById("result");
+  const okBox = document.getElementById("resultOk");
+  const errBox = document.getElementById("resultErr");
+
+  resultBox.classList.remove("ok", "err");
+  okBox.style.display = "none";
+  errBox.style.display = "none";
+
+  if (!dropoffVal) { showError("Please select your drop-off date."); return; }
+  if (!days || days < 1) { showError("Please enter a valid number of days."); return; }
+
+  const dropoffDate = new Date(dropoffVal + "T00:00:00");
+  const band = getBand(dropoffDate, terminal);
+
+  if (!band) {
+    showError("We couldn't find pricing for that date. Please call us on 02045690803 for a quote.");
+    return;
+  }
+
+  const rateTable = RATES[band];
+  if (!rateTable || days > rateTable.length) {
+    showError("For stays of " + days + " days, please contact us directly on 02045690803 or email info@airwiseparking.co.uk for a custom quote.");
+    return;
+  }
+
+  const price = rateTable[days - 1];
+  document.getElementById("priceOut").textContent = "£" + price;
+  okBox.style.display = "block";
+  resultBox.classList.add("ok", "show");
+
+  function showError(msg) {
+    errBox.textContent = msg;
+    errBox.style.display = "block";
+    resultBox.classList.add("err", "show");
+  }
+}
+
+document.getElementById("calcBtn").addEventListener("click", calculate);
+document.getElementById("dropoff").valueAsDate = new Date();
+</script>
+
+</body>
+</html>
