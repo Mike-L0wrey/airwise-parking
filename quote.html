@@ -183,6 +183,9 @@
     <label for="days">Number of days</label>
     <input type="number" id="days" min="1" max="30" value="7" />
 
+    <label for="email">Email (for your booking confirmation)</label>
+    <input type="email" id="email" placeholder="you@example.com" />
+
     <button id="calcBtn" type="button">Get my price</button>
 
     <div id="result" class="result">
@@ -190,6 +193,8 @@
         <div class="price-note">Estimated total price</div>
         <div class="price" id="priceOut">£0</div>
         <div class="price-note">Fully inclusive — no hidden fees.</div>
+        <button id="payBtn" type="button" style="margin-top:14px;">Pay now & confirm booking</button>
+        <div id="payError" style="display:none; margin-top:10px; font-size:0.85rem; color:#C0392B;"></div>
       </div>
       <div id="resultErr" class="err-text" style="display:none;"></div>
     </div>
@@ -265,6 +270,9 @@ function calculate() {
   okBox.style.display = "block";
   resultBox.classList.add("ok", "show");
 
+  // Remember these details so the Pay Now button can send them to the server
+  window._lastBooking = { terminal, dropoff: dropoffVal, days };
+
   function showError(msg) {
     errBox.textContent = msg;
     errBox.style.display = "block";
@@ -272,7 +280,47 @@ function calculate() {
   }
 }
 
+async function payNow() {
+  const payBtn = document.getElementById("payBtn");
+  const payError = document.getElementById("payError");
+  payError.style.display = "none";
+
+  if (!window._lastBooking) return;
+
+  const email = document.getElementById("email").value.trim();
+
+  payBtn.disabled = true;
+  payBtn.textContent = "Redirecting to secure payment…";
+
+  try {
+    const response = await fetch("/.netlify/functions/create-checkout-session", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        terminal: window._lastBooking.terminal,
+        dropoff: window._lastBooking.dropoff,
+        days: window._lastBooking.days,
+        customerEmail: email || undefined,
+      }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok || !data.url) {
+      throw new Error(data.error || "Something went wrong. Please try again.");
+    }
+
+    window.location.href = data.url;
+  } catch (err) {
+    payError.textContent = err.message || "Something went wrong. Please try again or contact us.";
+    payError.style.display = "block";
+    payBtn.disabled = false;
+    payBtn.textContent = "Pay now & confirm booking";
+  }
+}
+
 document.getElementById("calcBtn").addEventListener("click", calculate);
+document.getElementById("payBtn").addEventListener("click", payNow);
 document.getElementById("dropoff").valueAsDate = new Date();
 </script>
 
