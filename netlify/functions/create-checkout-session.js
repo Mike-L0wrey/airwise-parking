@@ -91,6 +91,15 @@ exports.handler = async (event) => {
           quantity: 1,
         },
       ],
+      // Stored here so the webhook (stripe-webhook.js) can read these back
+      // once payment succeeds, to send the confirmation email.
+      metadata: {
+        terminal,
+        terminalLabel,
+        dropoff,
+        days: String(numDays),
+        priceGBP: String(priceGBP),
+      },
       success_url: `${siteUrl}/quote.html?payment=success`,
       cancel_url: `${siteUrl}/quote.html?payment=cancelled`,
     });
