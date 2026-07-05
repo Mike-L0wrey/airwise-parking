@@ -528,8 +528,7 @@
   <div class="nav-links">
     <a href="#how-it-works" class="nav-text">How it works</a>
     <a href="#pricing" class="nav-text">Pricing</a>
-    <a href="quote.html" class="nav-text">Get a quote</a>
-    <a href="#book" class="nav-cta">Book parking</a>
+    <a href="quote.html" class="nav-cta">Get instant price</a>
   </div>
 </nav>
 
@@ -546,54 +545,12 @@
       </div>
     </div>
 
-    <!-- BOOKING WIDGET -->
+    <!-- INSTANT PRICE CTA -->
     <div class="booking-card" id="book">
-      <h2>Get a quick quote</h2>
-      <p class="sub">Tell us your dates and we'll be in touch within the hour.</p>
-      <div id="booking-form">
-        <div class="form-row full">
-          <div class="field">
-            <label>Your name</label>
-            <input type="text" placeholder="e.g. James Wilson" id="name" />
-          </div>
-        </div>
-        <div class="form-row full">
-          <div class="field">
-            <label>Phone number</label>
-            <input type="tel" placeholder="07700 900 000" id="phone" />
-          </div>
-        </div>
-        <div class="form-row">
-          <div class="field">
-            <label>Drop-off date</label>
-            <input type="date" id="dropoff" />
-          </div>
-          <div class="field">
-            <label>Pick-up date</label>
-            <input type="date" id="pickup" />
-          </div>
-        </div>
-        <div class="form-row full">
-          <div class="field">
-            <label>Terminal</label>
-            <select id="terminal">
-              <option value="">Select your terminal</option>
-              <option>Terminal 2</option>
-              <option>Terminal 3</option>
-              <option>Terminal 4</option>
-              <option>Terminal 5</option>
-              <option>Not sure yet</option>
-            </select>
-          </div>
-        </div>
-        <button class="submit-btn" onclick="submitForm()">Get my quote →</button>
-        <p class="privacy-note">🔒 Your details are kept private and never shared.</p>
-      </div>
-      <div class="success-msg" id="success">
-        <div class="tick">✅</div>
-        <h3>Thanks! We'll call you shortly.</h3>
-        <p>One of our team will be in touch within the hour to confirm your booking and take payment.</p>
-      </div>
+      <h2>Get an instant price</h2>
+      <p class="sub">Pick your terminal and dates, see your price straight away, and pay securely online — booking confirmed immediately.</p>
+      <a href="quote.html" class="submit-btn" style="display:block; text-align:center; text-decoration:none;">Check prices &amp; book instantly →</a>
+      <p class="privacy-note">🔒 Secure payment powered by Stripe.</p>
     </div>
   </div>
 </section>
@@ -660,68 +617,14 @@
   </div>
 </section>
 
-<!-- PRICING BAND -->
+<!-- PRICING + FINAL CTA -->
 <section class="pricing-band" id="pricing">
   <div class="section-inner">
     <div class="section-label" style="color: rgba(255,255,255,0.5);">Pricing</div>
     <h2 class="section-title">From <span style="color:var(--sky)">£5 per day</span></h2>
-    <p class="section-sub">Rates vary by date and duration — contact us for your exact quote. We're consistently cheaper than airport car parks.</p>
-    <a href="#book" class="submit-btn" style="display:inline-block; width:auto; padding: 15px 36px; text-decoration:none; font-family:'Sora',sans-serif; font-weight:700; font-size:1rem; background:var(--sky); color:var(--white); border-radius:8px;">Check availability →</a>
-    <a href="quote.html" style="display:inline-block; margin-left:16px; padding: 15px 36px; text-decoration:none; font-family:'Sora',sans-serif; font-weight:700; font-size:1rem; color:var(--white); border:1.5px solid rgba(255,255,255,0.3); border-radius:8px;">Get instant price →</a>
-  </div>
-</section>
-
-<!-- BOTTOM FORM -->
-<section class="section bottom-form">
-  <div class="section-inner">
-    <div class="bottom-form-wrap">
-      <h2>Ready to book?</h2>
-      <p class="sub">Leave your details and we'll call you to confirm everything.</p>
-      <div id="booking-form-2">
-        <div class="form-row full">
-          <div class="field">
-            <label>Your name</label>
-            <input type="text" placeholder="e.g. Sarah Ahmed" id="name2" />
-          </div>
-        </div>
-        <div class="form-row full">
-          <div class="field">
-            <label>Phone number</label>
-            <input type="tel" placeholder="07700 900 000" id="phone2" />
-          </div>
-        </div>
-        <div class="form-row">
-          <div class="field">
-            <label>Drop-off date</label>
-            <input type="date" id="dropoff2" />
-          </div>
-          <div class="field">
-            <label>Pick-up date</label>
-            <input type="date" id="pickup2" />
-          </div>
-        </div>
-        <div class="form-row full">
-          <div class="field">
-            <label>Terminal</label>
-            <select id="terminal2">
-              <option value="">Select your terminal</option>
-              <option>Terminal 2</option>
-              <option>Terminal 3</option>
-              <option>Terminal 4</option>
-              <option>Terminal 5</option>
-              <option>Not sure yet</option>
-            </select>
-          </div>
-        </div>
-        <button class="submit-btn" onclick="submitForm2()">Get my quote →</button>
-        <p class="privacy-note">🔒 Your details are kept private and never shared.</p>
-      </div>
-      <div class="success-msg" id="success2">
-        <div class="tick">✅</div>
-        <h3>Thanks! We'll call you shortly.</h3>
-        <p>One of our team will be in touch within the hour to confirm your booking and take payment.</p>
-      </div>
-    </div>
+    <p class="section-sub">Rates vary by date and duration — get your exact price in seconds. We're consistently cheaper than airport car parks.</p>
+    <a href="quote.html" class="submit-btn" style="display:inline-block; width:auto; padding: 15px 36px; text-decoration:none; font-family:'Sora',sans-serif; font-weight:700; font-size:1rem; background:var(--sky); color:var(--white); border-radius:8px;">Check prices &amp; book instantly →</a>
+    <p class="section-sub" style="margin-top:20px; margin-bottom:0;">🔒 Secure payment powered by Stripe. Prefer to speak to someone first? Call us on <a href="tel:02045690803" style="color:var(--sky);">02045690803</a>.</p>
   </div>
 </section>
 
@@ -732,54 +635,13 @@
   <div class="footer-links">
     <a href="#">Privacy policy</a>
     <a href="#">Terms</a>
-    <a href="mailto:hello@airwiseparking.co.uk">Contact</a>
+    <a href="mailto:info@airwiseparking.co.uk">Contact</a>
   </div>
 </footer>
 
 <script>
-  function submitForm() {
-    const name = document.getElementById('name').value.trim();
-    const phone = document.getElementById('phone').value.trim();
-    const dropoff = document.getElementById('dropoff').value;
-    const pickup = document.getElementById('pickup').value;
-
-    if (!name || !phone || !dropoff || !pickup) {
-      alert('Please fill in your name, phone number, and travel dates.');
-      return;
-    }
-
-    document.getElementById('booking-form').style.display = 'none';
-    document.getElementById('success').style.display = 'block';
-
-    // TODO: replace with real form submission (e.g. Formspree, EmailJS, or your own endpoint)
-    console.log('Lead captured:', { name, phone, dropoff, pickup,
-      terminal: document.getElementById('terminal').value });
-  }
-
-  function submitForm2() {
-    const name = document.getElementById('name2').value.trim();
-    const phone = document.getElementById('phone2').value.trim();
-    const dropoff = document.getElementById('dropoff2').value;
-    const pickup = document.getElementById('pickup2').value;
-
-    if (!name || !phone || !dropoff || !pickup) {
-      alert('Please fill in your name, phone number, and travel dates.');
-      return;
-    }
-
-    document.getElementById('booking-form-2').style.display = 'none';
-    document.getElementById('success2').style.display = 'block';
-
-    console.log('Lead captured:', { name, phone, dropoff, pickup,
-      terminal: document.getElementById('terminal2').value });
-  }
-
-  // Set min date to today for date inputs
-  const today = new Date().toISOString().split('T')[0];
-  ['dropoff','pickup','dropoff2','pickup2'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.min = today;
-  });
+  // All quote/date/terminal logic now lives in quote.html, which handles
+  // the real pricing calculation and Stripe Checkout redirect.
 </script>
 
 </body>
