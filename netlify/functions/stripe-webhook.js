@@ -61,6 +61,20 @@ exports.handler = async (event) => {
     } else {
       console.error('No customer email found on session', session.id);
     }
+
+    try {
+      await createCalendarEvent({
+        customerEmail,
+        terminalLabel: meta.terminalLabel || 'Unknown terminal',
+        dropoff: meta.dropoff,
+        days: meta.days,
+        priceGBP: meta.priceGBP,
+      });
+    } catch (err) {
+      // Same principle — a calendar hiccup shouldn't block the webhook
+      // or affect the customer. We just log it so it can be checked.
+      console.error('Failed to create calendar event:', err.message);
+    }
   }
 
   return { statusCode: 200, body: JSON.stringify({ received: true }) };
@@ -131,5 +145,96 @@ async function sendConfirmationEmail({ to, terminalLabel, dropoff, days, priceGB
   if (!response.ok) {
     const errText = await response.text();
     throw new Error(`Resend API error: ${errText}`);
+  }
+}
+
+// ---- Google Calendar integration ----
+//
+// We talk to Google's API directly (no extra npm packages needed) by:
+// 1. Signing a short-lived JWT with our service account's private key
+// 2. Exchanging that JWT for an access token
+// 3. Using that access token to create a calendar event
+//
+// This uses Node's built-in "crypto" module, already available in
+// Netlify Functions — nothing new to install.
+
+const crypto = require('crypto');
+
+async function getGoogleAccessToken() {
+  const clientEmail = process.env.GOOGLE_CLIENT_EMAIL;
+  const privateKey = process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, '\n');
+
+  const nowSeconds = Math.floor(Date.now() / 1000);
+  const header = { alg: 'RS256', typ: 'JWT' };
+  const claims = {
+    iss: clientEmail,
+    scope: 'https://www.googleapis.com/auth/calendar',
+    aud: 'https://oauth2.googleapis.com/token',
+    iat: nowSeconds,
+    exp: nowSeconds + 3600,
+  };
+
+  const base64url = (obj) =>
+    Buffer.from(JSON.stringify(obj)).toString('base64url');
+
+  const unsignedJwt = `${base64url(header)}.${base64url(claims)}`;
+  const signature = crypto
+    .sign('RSA-SHA256', Buffer.from(unsignedJwt), privateKey)
+    .toString('base64url');
+  const signedJwt = `${unsignedJwt}.${signature}`;
+
+  const response = await fetch('https://oauth2.googleapis.com/token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({
+      grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+      assertion: signedJwt,
+    }),
+  });
+
+  if (!response.ok) {
+    const errText = await response.text();
+    throw new Error(`Google auth error: ${errText}`);
+  }
+
+  const data = await response.json();
+  return data.access_token;
+}
+
+async function createCalendarEvent({ customerEmail, terminalLabel, dropoff, days, priceGBP }) {
+  if (!dropoff || !days) {
+    throw new Error('Missing dropoff or days, cannot create calendar event');
+  }
+
+  const accessToken = await getGoogleAccessToken();
+  const calendarId = process.env.GOOGLE_CALENDAR_ID;
+
+  const startDate = dropoff; // "YYYY-MM-DD"
+  const endDateObj = new Date(dropoff + 'T00:00:00Z');
+  endDateObj.setUTCDate(endDateObj.getUTCDate() + parseInt(days, 10));
+  const endDate = endDateObj.toISOString().slice(0, 10);
+
+  const event = {
+    summary: `Airwise Booking — ${terminalLabel} — ${customerEmail || 'no email'}`,
+    description: `Terminal: ${terminalLabel}\nDays: ${days}\nAmount paid: £${priceGBP}\nCustomer email: ${customerEmail || 'not provided'}`,
+    start: { date: startDate },
+    end: { date: endDate },
+  };
+
+  const response = await fetch(
+    `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(calendarId)}/events`,
+    {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(event),
+    }
+  );
+
+  if (!response.ok) {
+    const errText = await response.text();
+    throw new Error(`Google Calendar API error: ${errText}`);
   }
 }
