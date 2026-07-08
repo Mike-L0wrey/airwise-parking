@@ -4,6 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Get a Quote | Airwise Parking</title>
+<meta name="color-scheme" content="light" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
@@ -22,6 +23,8 @@
     --green: #1DB87A;
     --red: #C0392B;
   }
+
+  html { color-scheme: light; }
 
   body {
     font-family: 'Inter', sans-serif;
@@ -93,7 +96,7 @@
   }
   label:first-of-type { margin-top: 0; }
 
-  select, input[type="date"], input[type="number"] {
+  select, input[type="date"], input[type="number"], input[type="text"], input[type="tel"], input[type="datetime-local"], textarea {
     width: 100%;
     padding: 12px 14px;
     border-radius: 8px;
@@ -104,10 +107,45 @@
     background: var(--white);
     outline: none;
   }
-  select:focus, input:focus {
+  textarea { resize: vertical; min-height: 70px; }
+  select:focus, input:focus, textarea:focus {
     border-color: var(--sky);
     box-shadow: 0 0 0 3px rgba(59,158,232,0.12);
   }
+
+  .step { display: none; }
+  .step.active { display: block; }
+
+  .step-back {
+    display: inline-block;
+    font-size: 0.8rem;
+    color: var(--slate);
+    text-decoration: none;
+    margin-bottom: 14px;
+    cursor: pointer;
+  }
+  .step-back:hover { color: var(--navy); }
+
+  .summary-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.9rem;
+  }
+  .summary-row:last-child { border-bottom: none; }
+  .summary-row .label { color: var(--slate); }
+  .summary-row .value { font-weight: 600; }
+
+  .section-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--sky);
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    margin: 22px 0 4px;
+  }
+  .section-label:first-of-type { margin-top: 0; }
 
   button {
     width: 100%;
@@ -166,37 +204,77 @@
 <div class="wrap">
   <div class="eyebrow">Instant pricing</div>
   <h1>Get your parking price</h1>
-  <p class="sub">Select your terminal and dates for an instant quote.</p>
+  <p class="sub" id="pageSub">Select your airport, dates and times for an instant quote.</p>
 
   <div class="card">
-    <label for="terminal">Terminal</label>
-    <select id="terminal">
-      <option value="235">Terminal 2</option>
-      <option value="235">Terminal 3</option>
-      <option value="4">Terminal 4</option>
-      <option value="235">Terminal 5</option>
-    </select>
 
-    <label for="dropoff">Drop-off date</label>
-    <input type="date" id="dropoff" />
+    <!-- STEP 1: Quote -->
+    <div class="step active" id="step1">
+      <label for="terminal">Airport</label>
+      <select id="terminal">
+        <option value="235">Heathrow — Terminal 2</option>
+        <option value="235">Heathrow — Terminal 3</option>
+        <option value="4">Heathrow — Terminal 4</option>
+        <option value="235">Heathrow — Terminal 5</option>
+      </select>
 
-    <label for="days">Number of days</label>
-    <input type="number" id="days" min="1" max="30" value="7" />
+      <label for="dropoffDT">Drop-off Date & Time</label>
+      <input type="datetime-local" id="dropoffDT" />
 
-    <label for="email">Email (for your booking confirmation)</label>
-    <input type="email" id="email" placeholder="you@example.com" />
+      <label for="pickupDT">Pick-up Date & Time</label>
+      <input type="datetime-local" id="pickupDT" />
+      <p class="price-note" style="margin-top:6px;">Drop-offs and collections are available between 04:30 and 23:30.</p>
 
-    <button id="calcBtn" type="button">Get my price</button>
+      <button id="calcBtn" type="button">Get Quote</button>
 
-    <div id="result" class="result">
-      <div id="resultOk" style="display:none;">
-        <div class="price-note">Estimated total price</div>
-        <div class="price" id="priceOut">£0</div>
-        <div class="price-note">Fully inclusive — no hidden fees.</div>
-        <button id="payBtn" type="button" style="margin-top:14px;">Pay now & confirm booking</button>
-        <div id="payError" style="display:none; margin-top:10px; font-size:0.85rem; color:#C0392B;"></div>
-      </div>
-      <div id="resultErr" class="err-text" style="display:none;"></div>
+      <div id="resultErr" class="err-text" style="display:none; margin-top:16px;"></div>
+    </div>
+
+    <!-- STEP 2: Confirm rate -->
+    <div class="step" id="step2">
+      <a class="step-back" id="backTo1">← Back to change dates</a>
+      <div class="price-note">Your quoted price</div>
+      <div class="price" id="priceOut">£0</div>
+      <div class="price-note" style="margin-bottom:16px;">Fully inclusive — no hidden fees.</div>
+
+      <div class="summary-row"><span class="label">Airport</span><span class="value" id="sumAirport"></span></div>
+      <div class="summary-row"><span class="label">Drop-off</span><span class="value" id="sumDropoff"></span></div>
+      <div class="summary-row"><span class="label">Pick-up</span><span class="value" id="sumPickup"></span></div>
+
+      <button id="confirmRateBtn" type="button" style="margin-top:20px;">Accept price & continue</button>
+    </div>
+
+    <!-- STEP 3: Your details -->
+    <div class="step" id="step3">
+      <a class="step-back" id="backTo2">← Back to price</a>
+
+      <div class="section-label">Customer Details</div>
+      <label for="custName">Full name</label>
+      <input type="text" id="custName" placeholder="Jane Smith" />
+      <label for="email">Email</label>
+      <input type="email" id="email" placeholder="you@example.com" />
+      <label for="custPhone">Phone</label>
+      <input type="tel" id="custPhone" placeholder="07700 900000" />
+
+      <div class="section-label">Vehicle Details</div>
+      <label for="vehicleReg">Vehicle registration</label>
+      <input type="text" id="vehicleReg" placeholder="e.g. AB12 CDE" style="text-transform:uppercase;" />
+      <label for="vehicleComments">Comments (optional)</label>
+      <textarea id="vehicleComments" placeholder="e.g. colour, make/model, any existing damage"></textarea>
+
+      <div class="section-label">Flight Details</div>
+      <label for="returnTerminal">Return terminal</label>
+      <select id="returnTerminal">
+        <option value="Terminal 2">Terminal 2</option>
+        <option value="Terminal 3">Terminal 3</option>
+        <option value="Terminal 4">Terminal 4</option>
+        <option value="Terminal 5">Terminal 5</option>
+      </select>
+      <label for="returnFlight">Return flight number</label>
+      <input type="text" id="returnFlight" placeholder="e.g. BA123" style="text-transform:uppercase;" />
+
+      <button id="payBtn" type="button" style="margin-top:24px;">Pay now & confirm booking</button>
+      <div id="payError" style="display:none; margin-top:10px; font-size:0.85rem; color:#C0392B;"></div>
     </div>
 
     <p class="disclaimer">Prices shown are estimates based on current rates and may change. Final price is confirmed when your booking is placed.</p>
@@ -237,19 +315,42 @@ function getBand(dateObj, terminalGroup) {
 
 function calculate() {
   const terminal = document.getElementById("terminal").value;
-  const dropoffVal = document.getElementById("dropoff").value;
-  const days = parseInt(document.getElementById("days").value, 10);
+  const terminalLabelText = document.getElementById("terminal").selectedOptions[0].textContent;
+  const dropoffDTVal = document.getElementById("dropoffDT").value;
+  const pickupDTVal = document.getElementById("pickupDT").value;
 
-  const resultBox = document.getElementById("result");
-  const okBox = document.getElementById("resultOk");
   const errBox = document.getElementById("resultErr");
-
-  resultBox.classList.remove("ok", "err");
-  okBox.style.display = "none";
   errBox.style.display = "none";
 
-  if (!dropoffVal) { showError("Please select your drop-off date."); return; }
-  if (!days || days < 1) { showError("Please enter a valid number of days."); return; }
+  if (!dropoffDTVal) { showError("Please select your drop-off date & time."); return; }
+  if (!pickupDTVal) { showError("Please select your pick-up date & time."); return; }
+
+  // datetime-local values look like "2026-07-05T14:30"
+  const [dropoffVal, dropoffTimeVal] = dropoffDTVal.split("T");
+  const [pickupDateVal, returnTimeVal] = pickupDTVal.split("T");
+
+  const dropoffDateTime = new Date(dropoffDTVal);
+  const pickupDateTime = new Date(pickupDTVal);
+
+  if (pickupDateTime <= dropoffDateTime) {
+    showError("Your pick-up date & time must be after your drop-off date & time.");
+    return;
+  }
+
+  // The operator doesn't take drop-offs or collections outside 04:30–23:30.
+  if (!isWithinOperatingHours(dropoffTimeVal)) {
+    showError("Sorry, drop-offs aren't available before 04:30 or after 23:30. Please choose a different time.");
+    return;
+  }
+  if (!isWithinOperatingHours(returnTimeVal)) {
+    showError("Sorry, collections aren't available before 04:30 or after 23:30. Please choose a different time.");
+    return;
+  }
+
+  // Days is the number of calendar days spanned, rounded up so a booking
+  // that runs even slightly into the next day counts as another day.
+  const msPerDay = 1000 * 60 * 60 * 24;
+  const days = Math.ceil((pickupDateTime - dropoffDateTime) / msPerDay) || 1;
 
   const dropoffDate = new Date(dropoffVal + "T00:00:00");
   const band = getBand(dropoffDate, terminal);
@@ -266,18 +367,62 @@ function calculate() {
   }
 
   const price = rateTable[days - 1];
-  document.getElementById("priceOut").textContent = "£" + price;
-  okBox.style.display = "block";
-  resultBox.classList.add("ok", "show");
 
-  // Remember these details so the Pay Now button can send them to the server
-  window._lastBooking = { terminal, dropoff: dropoffVal, days };
+  // Remember these details so later steps and the Pay Now button can use them
+  window._lastBooking = {
+    terminal,
+    terminalLabelText,
+    dropoff: dropoffVal,
+    dropoffTime: dropoffTimeVal,
+    days,
+    returnTime: returnTimeVal,
+    dropoffDT: dropoffDTVal,
+    pickupDT: pickupDTVal,
+    price,
+  };
+
+  // Populate the confirm-rate step with a readable summary
+  document.getElementById("priceOut").textContent = "£" + price;
+  document.getElementById("sumAirport").textContent = terminalLabelText;
+  document.getElementById("sumDropoff").textContent = formatDT(dropoffDTVal);
+  document.getElementById("sumPickup").textContent = formatDT(pickupDTVal);
+
+  goToStep(2);
 
   function showError(msg) {
     errBox.textContent = msg;
     errBox.style.display = "block";
-    resultBox.classList.add("err", "show");
   }
+}
+
+function isWithinOperatingHours(timeStr) {
+  // timeStr is "HH:MM". Operator doesn't take drop-offs or collections
+  // before 04:30 or after 23:30.
+  if (!timeStr) return false;
+  const [h, m] = timeStr.split(":").map(Number);
+  const minutes = h * 60 + m;
+  const earliestMinutes = 4 * 60 + 30;  // 04:30
+  const latestMinutes = 23 * 60 + 30;   // 23:30
+  return minutes >= earliestMinutes && minutes <= latestMinutes;
+}
+
+function formatDT(dtLocalVal) {
+  const d = new Date(dtLocalVal);
+  const datePart = d.toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short" });
+  const timePart = d.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
+  return `${datePart}, ${timePart}`;
+}
+
+function goToStep(stepNum) {
+  document.querySelectorAll(".step").forEach((el) => el.classList.remove("active"));
+  document.getElementById("step" + stepNum).classList.add("active");
+
+  const subtitles = {
+    1: "Select your airport, dates and times for an instant quote.",
+    2: "Review your price before entering your details.",
+    3: "Just a few details so we can confirm your booking.",
+  };
+  document.getElementById("pageSub").textContent = subtitles[stepNum];
 }
 
 async function payNow() {
@@ -287,7 +432,19 @@ async function payNow() {
 
   if (!window._lastBooking) return;
 
+  const custName = document.getElementById("custName").value.trim();
   const email = document.getElementById("email").value.trim();
+  const custPhone = document.getElementById("custPhone").value.trim();
+  const vehicleReg = document.getElementById("vehicleReg").value.trim();
+  const vehicleComments = document.getElementById("vehicleComments").value.trim();
+  const returnTerminal = document.getElementById("returnTerminal").value;
+  const returnFlight = document.getElementById("returnFlight").value.trim();
+
+  if (!custName) { payError.textContent = "Please enter your name."; payError.style.display = "block"; return; }
+  if (!email) { payError.textContent = "Please enter your email."; payError.style.display = "block"; return; }
+  if (!custPhone) { payError.textContent = "Please enter your phone number."; payError.style.display = "block"; return; }
+  if (!vehicleReg) { payError.textContent = "Please enter your vehicle registration."; payError.style.display = "block"; return; }
+  if (!returnFlight) { payError.textContent = "Please enter your return flight number."; payError.style.display = "block"; return; }
 
   payBtn.disabled = true;
   payBtn.textContent = "Redirecting to secure payment…";
@@ -299,8 +456,16 @@ async function payNow() {
       body: JSON.stringify({
         terminal: window._lastBooking.terminal,
         dropoff: window._lastBooking.dropoff,
+        dropoffTime: window._lastBooking.dropoffTime,
         days: window._lastBooking.days,
+        returnTime: window._lastBooking.returnTime,
         customerEmail: email || undefined,
+        customerName: custName,
+        customerPhone: custPhone,
+        vehicleReg,
+        vehicleComments,
+        returnTerminal,
+        returnFlight,
       }),
     });
 
@@ -320,8 +485,29 @@ async function payNow() {
 }
 
 document.getElementById("calcBtn").addEventListener("click", calculate);
+document.getElementById("confirmRateBtn").addEventListener("click", () => goToStep(3));
 document.getElementById("payBtn").addEventListener("click", payNow);
-document.getElementById("dropoff").valueAsDate = new Date();
+document.getElementById("backTo1").addEventListener("click", () => goToStep(1));
+document.getElementById("backTo2").addEventListener("click", () => goToStep(2));
+
+// Default drop-off to now, and pick-up to 7 days from now, so the fields
+// aren't empty on first load — matches the "pre-filled" feel of most
+// booking widgets while still being fully editable.
+(function setDefaultDateTimes() {
+  const pad = (n) => String(n).padStart(2, "0");
+  const toLocalInputValue = (d) =>
+    `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+
+  const now = new Date();
+  now.setMinutes(0, 0, 0);
+  now.setHours(now.getHours() + 1);
+
+  const oneWeekLater = new Date(now);
+  oneWeekLater.setDate(oneWeekLater.getDate() + 7);
+
+  document.getElementById("dropoffDT").value = toLocalInputValue(now);
+  document.getElementById("pickupDT").value = toLocalInputValue(oneWeekLater);
+})();
 </script>
 
 </body>

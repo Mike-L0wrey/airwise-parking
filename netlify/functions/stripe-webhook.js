@@ -49,8 +49,16 @@ exports.handler = async (event) => {
           to: customerEmail,
           terminalLabel: meta.terminalLabel || 'your terminal',
           dropoff: meta.dropoff,
+          dropoffTime: meta.dropoffTime,
           days: meta.days,
+          returnTime: meta.returnTime,
           priceGBP: meta.priceGBP,
+          customerName: meta.customerName,
+          customerPhone: meta.customerPhone,
+          vehicleReg: meta.vehicleReg,
+          vehicleComments: meta.vehicleComments,
+          returnTerminal: meta.returnTerminal,
+          returnFlight: meta.returnFlight,
         });
       } catch (err) {
         // We don't fail the whole webhook if the email fails —
@@ -67,8 +75,16 @@ exports.handler = async (event) => {
         customerEmail,
         terminalLabel: meta.terminalLabel || 'Unknown terminal',
         dropoff: meta.dropoff,
+        dropoffTime: meta.dropoffTime,
         days: meta.days,
+        returnTime: meta.returnTime,
         priceGBP: meta.priceGBP,
+        customerName: meta.customerName,
+        customerPhone: meta.customerPhone,
+        vehicleReg: meta.vehicleReg,
+        vehicleComments: meta.vehicleComments,
+        returnTerminal: meta.returnTerminal,
+        returnFlight: meta.returnFlight,
       });
     } catch (err) {
       // Same principle — a calendar hiccup shouldn't block the webhook
@@ -80,8 +96,11 @@ exports.handler = async (event) => {
   return { statusCode: 200, body: JSON.stringify({ received: true }) };
 };
 
-async function sendConfirmationEmail({ to, terminalLabel, dropoff, days, priceGBP }) {
-  const formattedDate = dropoff
+async function sendConfirmationEmail({
+  to, terminalLabel, dropoff, dropoffTime, days, returnTime, priceGBP,
+  customerName, customerPhone, vehicleReg, vehicleComments, returnTerminal, returnFlight,
+}) {
+  const formattedDropoffDate = dropoff
     ? new Date(dropoff + 'T00:00:00Z').toLocaleDateString('en-GB', {
         weekday: 'long',
         day: 'numeric',
@@ -90,10 +109,25 @@ async function sendConfirmationEmail({ to, terminalLabel, dropoff, days, priceGB
       })
     : 'your selected date';
 
+  let formattedReturnDate = 'your return date';
+  if (dropoff && days) {
+    const returnDateObj = new Date(dropoff + 'T00:00:00Z');
+    returnDateObj.setUTCDate(returnDateObj.getUTCDate() + parseInt(days, 10));
+    formattedReturnDate = returnDateObj.toLocaleDateString('en-GB', {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+    });
+  }
+
+  const firstName = (customerName || '').trim().split(' ')[0];
+  const greetingName = firstName ? `, ${escapeHtml(firstName)}` : '';
+
   const html = `
     <div style="font-family: Arial, sans-serif; max-width: 480px; margin: 0 auto; color: #0B1E3D;">
       <h1 style="font-size: 1.4rem; margin-bottom: 4px;">Booking confirmed ✅</h1>
-      <p style="color: #6B7A8D; margin-top: 0;">Thanks for booking with Airwise Parking.</p>
+      <p style="color: #6B7A8D; margin-top: 0;">Thanks for booking with Airwise Parking${greetingName}.</p>
 
       <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
         <tr>
@@ -101,8 +135,20 @@ async function sendConfirmationEmail({ to, terminalLabel, dropoff, days, priceGB
           <td style="padding: 8px 0; text-align: right; font-weight: bold;">${terminalLabel}</td>
         </tr>
         <tr>
-          <td style="padding: 8px 0; color: #6B7A8D;">Drop-off date</td>
-          <td style="padding: 8px 0; text-align: right; font-weight: bold;">${formattedDate}</td>
+          <td style="padding: 8px 0; color: #6B7A8D;">Drop-off</td>
+          <td style="padding: 8px 0; text-align: right; font-weight: bold;">${formattedDropoffDate}${dropoffTime ? ' at ' + dropoffTime : ''}</td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 0; color: #6B7A8D;">Return</td>
+          <td style="padding: 8px 0; text-align: right; font-weight: bold;">${formattedReturnDate}${returnTime ? ' at ' + returnTime : ''}</td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 0; color: #6B7A8D;">Return terminal</td>
+          <td style="padding: 8px 0; text-align: right; font-weight: bold;">${escapeHtml(returnTerminal) || '-'}</td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 0; color: #6B7A8D;">Return flight</td>
+          <td style="padding: 8px 0; text-align: right; font-weight: bold;">${escapeHtml(returnFlight) || '-'}</td>
         </tr>
         <tr>
           <td style="padding: 8px 0; color: #6B7A8D;">Number of days</td>
@@ -114,11 +160,28 @@ async function sendConfirmationEmail({ to, terminalLabel, dropoff, days, priceGB
         </tr>
       </table>
 
+      <h3 style="font-size: 1rem; margin-bottom: 4px;">Your details</h3>
+      <table style="width: 100%; border-collapse: collapse; margin: 8px 0 20px;">
+        <tr>
+          <td style="padding: 6px 0; color: #6B7A8D;">Name</td>
+          <td style="padding: 6px 0; text-align: right;">${escapeHtml(customerName) || '-'}</td>
+        </tr>
+        <tr>
+          <td style="padding: 6px 0; color: #6B7A8D;">Phone</td>
+          <td style="padding: 6px 0; text-align: right;">${escapeHtml(customerPhone) || '-'}</td>
+        </tr>
+        <tr>
+          <td style="padding: 6px 0; color: #6B7A8D;">Vehicle registration</td>
+          <td style="padding: 6px 0; text-align: right;">${escapeHtml(vehicleReg) || '-'}</td>
+        </tr>
+        ${vehicleComments ? `<tr><td style="padding: 6px 0; color: #6B7A8D;">Vehicle notes</td><td style="padding: 6px 0; text-align: right;">${escapeHtml(vehicleComments)}</td></tr>` : ''}
+      </table>
+
       <h3 style="font-size: 1rem; margin-bottom: 4px;">What happens next</h3>
       <p style="color: #333; line-height: 1.6;">
-        On your drop-off date, drive to departures and hand your keys to our operator's
-        team — they'll take your car straight to the secure compound. When you land,
-        it'll be ready and waiting for you at arrivals.
+        On your drop-off date, drive to departures at your drop-off time and hand your keys
+        to our operator's team — they'll take your car straight to the secure compound.
+        At your return time, it'll be ready and waiting for you at arrivals.
       </p>
 
       <p style="color: #6B7A8D; font-size: 0.85rem; margin-top: 24px;">
@@ -159,6 +222,16 @@ async function sendConfirmationEmail({ to, terminalLabel, dropoff, days, priceGB
 // Netlify Functions — nothing new to install.
 
 const crypto = require('crypto');
+
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
 
 async function getGoogleAccessToken() {
   const clientEmail = process.env.GOOGLE_CLIENT_EMAIL;
@@ -201,7 +274,10 @@ async function getGoogleAccessToken() {
   return data.access_token;
 }
 
-async function createCalendarEvent({ customerEmail, terminalLabel, dropoff, days, priceGBP }) {
+async function createCalendarEvent({
+  customerEmail, terminalLabel, dropoff, dropoffTime, days, returnTime, priceGBP,
+  customerName, customerPhone, vehicleReg, vehicleComments, returnTerminal, returnFlight,
+}) {
   if (!dropoff || !days) {
     throw new Error('Missing dropoff or days, cannot create calendar event');
   }
@@ -209,16 +285,45 @@ async function createCalendarEvent({ customerEmail, terminalLabel, dropoff, days
   const accessToken = await getGoogleAccessToken();
   const calendarId = process.env.GOOGLE_CALENDAR_ID;
 
-  const startDate = dropoff; // "YYYY-MM-DD"
-  const endDateObj = new Date(dropoff + 'T00:00:00Z');
-  endDateObj.setUTCDate(endDateObj.getUTCDate() + parseInt(days, 10));
-  const endDate = endDateObj.toISOString().slice(0, 10);
+  // Work out the return date from dropoff + days
+  const returnDateObj = new Date(dropoff + 'T00:00:00Z');
+  returnDateObj.setUTCDate(returnDateObj.getUTCDate() + parseInt(days, 10));
+  const returnDate = returnDateObj.toISOString().slice(0, 10);
+
+  // Default to a sensible time if either is somehow missing, so the event
+  // still gets created rather than failing outright.
+  const safeDropoffTime = dropoffTime || '09:00';
+  const safeReturnTime = returnTime || '09:00';
+
+  const descriptionLines = [
+    `Terminal: ${terminalLabel}`,
+    `Drop-off: ${dropoff} ${safeDropoffTime}`,
+    `Return: ${returnDate} ${safeReturnTime}`,
+    `Return terminal: ${returnTerminal || '-'}`,
+    `Return flight: ${returnFlight || '-'}`,
+    `Days: ${days}`,
+    `Amount paid: £${priceGBP}`,
+    ``,
+    `Customer: ${customerName || 'not provided'}`,
+    `Phone: ${customerPhone || 'not provided'}`,
+    `Email: ${customerEmail || 'not provided'}`,
+    `Vehicle reg: ${vehicleReg || 'not provided'}`,
+  ];
+  if (vehicleComments) {
+    descriptionLines.push(`Vehicle notes: ${vehicleComments}`);
+  }
 
   const event = {
-    summary: `Airwise Booking — ${terminalLabel} — ${customerEmail || 'no email'}`,
-    description: `Terminal: ${terminalLabel}\nDays: ${days}\nAmount paid: £${priceGBP}\nCustomer email: ${customerEmail || 'not provided'}`,
-    start: { date: startDate },
-    end: { date: endDate },
+    summary: `Airwise Booking — ${terminalLabel} — ${customerName || customerEmail || 'no name'} — ${vehicleReg || 'no reg'}`,
+    description: descriptionLines.join('\n'),
+    start: {
+      dateTime: `${dropoff}T${safeDropoffTime}:00`,
+      timeZone: 'Europe/London',
+    },
+    end: {
+      dateTime: `${returnDate}T${safeReturnTime}:00`,
+      timeZone: 'Europe/London',
+    },
   };
 
   const response = await fetch(

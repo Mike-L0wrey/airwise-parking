@@ -44,11 +44,41 @@ exports.handler = async (event) => {
     return { statusCode: 400, body: JSON.stringify({ error: 'Invalid request.' }) };
   }
 
-  const { terminal, dropoff, days, customerEmail } = body;
+  const {
+    terminal, dropoff, dropoffTime, days, returnTime, customerEmail,
+    customerName, customerPhone, vehicleReg, vehicleComments,
+    returnTerminal, returnFlight,
+  } = body;
   const numDays = parseInt(days, 10);
 
   if (!terminal || !dropoff || !numDays || numDays < 1) {
     return { statusCode: 400, body: JSON.stringify({ error: 'Missing or invalid booking details.' }) };
+  }
+
+  const timePattern = /^([01]\d|2[0-3]):([0-5]\d)$/;
+  if (!dropoffTime || !timePattern.test(dropoffTime)) {
+    return { statusCode: 400, body: JSON.stringify({ error: 'Missing or invalid drop-off time.' }) };
+  }
+  if (!returnTime || !timePattern.test(returnTime)) {
+    return { statusCode: 400, body: JSON.stringify({ error: 'Missing or invalid return time.' }) };
+  }
+
+  // The operator doesn't take drop-offs or collections outside 04:30–23:30.
+  // This is enforced here too (not just in the browser) so it can't be bypassed.
+  const isWithinOperatingHours = (timeStr) => {
+    const [h, m] = timeStr.split(':').map(Number);
+    const minutes = h * 60 + m;
+    return minutes >= 4 * 60 + 30 && minutes <= 23 * 60 + 30;
+  };
+  if (!isWithinOperatingHours(dropoffTime)) {
+    return { statusCode: 400, body: JSON.stringify({ error: "Drop-offs aren't available before 04:30 or after 23:30." }) };
+  }
+  if (!isWithinOperatingHours(returnTime)) {
+    return { statusCode: 400, body: JSON.stringify({ error: "Collections aren't available before 04:30 or after 23:30." }) };
+  }
+
+  if (!customerName || !customerPhone || !vehicleReg || !returnFlight) {
+    return { statusCode: 400, body: JSON.stringify({ error: 'Please fill in all required customer, vehicle, and flight details.' }) };
   }
 
   const dropoffDate = new Date(dropoff + 'T00:00:00Z');
@@ -84,7 +114,7 @@ exports.handler = async (event) => {
           price_data: {
             currency: 'gbp',
             product_data: {
-              name: `Airwise Parking — ${terminalLabel} — ${numDays} day(s) from ${dropoff}`,
+              name: `Airwise Parking — ${terminalLabel} — ${numDays} day(s) from ${dropoff} ${dropoffTime}`,
             },
             unit_amount: amountPence,
           },
@@ -92,13 +122,22 @@ exports.handler = async (event) => {
         },
       ],
       // Stored here so the webhook (stripe-webhook.js) can read these back
-      // once payment succeeds, to send the confirmation email.
+      // once payment succeeds, to send the confirmation email and create
+      // the timed calendar event.
       metadata: {
         terminal,
         terminalLabel,
         dropoff,
+        dropoffTime,
         days: String(numDays),
+        returnTime,
         priceGBP: String(priceGBP),
+        customerName,
+        customerPhone,
+        vehicleReg,
+        vehicleComments: (vehicleComments || '').slice(0, 490),
+        returnTerminal: returnTerminal || '',
+        returnFlight,
       },
       success_url: `${siteUrl}/quote.html?payment=success`,
       cancel_url: `${siteUrl}/quote.html?payment=cancelled`,
