@@ -41,7 +41,7 @@
     padding: 18px 48px;
     background: var(--navy);
   }
-  .logo { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 1.25rem; color: var(--white); }
+  .logo { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 1.25rem; color: var(--white); text-decoration: none; }
   .logo span { color: var(--sky); }
   nav a { color: rgba(255,255,255,0.75); text-decoration: none; font-size: 0.875rem; font-weight: 500; }
   nav a:hover { color: var(--white); }
@@ -85,57 +85,59 @@
     box-shadow: 0 2px 4px rgba(0,0,0,0.04), 0 12px 32px rgba(11,30,61,0.08);
   }
 
-  label {
+  /* ---- Field boxes, styled to match label | value | icon layout ---- */
+  .field { margin-bottom: 14px; }
+  .field-label {
     display: block;
-    font-size: 0.75rem;
-    font-weight: 600;
+    font-size: 0.7rem;
+    font-weight: 700;
     color: var(--slate);
     text-transform: uppercase;
-    letter-spacing: 0.06em;
-    margin: 18px 0 6px;
+    letter-spacing: 0.05em;
+    margin-bottom: 6px;
   }
-  label:first-of-type { margin-top: 0; }
-
-  select, input[type="date"], input[type="number"], input[type="text"], input[type="tel"], input[type="datetime-local"], textarea {
-    width: 100%;
-    padding: 12px 14px;
-    border-radius: 8px;
+  .field-box {
+    position: relative;
+    display: flex;
+    align-items: center;
     border: 1.5px solid var(--border);
-    font-family: 'Inter', sans-serif;
-    font-size: 0.9rem;
-    color: var(--navy);
+    border-radius: 10px;
     background: var(--white);
-    outline: none;
+    transition: border-color 0.15s;
   }
-  textarea { resize: vertical; min-height: 70px; }
-  select:focus, input:focus, textarea:focus {
+  .field-box:focus-within {
     border-color: var(--sky);
     box-shadow: 0 0 0 3px rgba(59,158,232,0.12);
   }
-
-  .step { display: none; }
-  .step.active { display: block; }
-
-  .step-back {
-    display: inline-block;
-    font-size: 0.8rem;
-    color: var(--slate);
-    text-decoration: none;
-    margin-bottom: 14px;
-    cursor: pointer;
-  }
-  .step-back:hover { color: var(--navy); }
-
-  .summary-row {
-    display: flex;
-    justify-content: space-between;
-    padding: 10px 0;
-    border-bottom: 1px solid var(--border);
+  .field-box select,
+  .field-box input,
+  .field-box textarea {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-family: 'Inter', sans-serif;
     font-size: 0.9rem;
+    color: var(--navy);
+    padding: 12px 40px 12px 14px;
+    width: 100%;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
   }
-  .summary-row:last-child { border-bottom: none; }
-  .summary-row .label { color: var(--slate); }
-  .summary-row .value { font-weight: 600; }
+  .field-box textarea { resize: vertical; min-height: 64px; padding-top: 12px; }
+  .field-icon {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1rem;
+    opacity: 0.55;
+    pointer-events: none;
+  }
+
+  .field-row-2 { display: flex; gap: 10px; }
+  .field-row-2 .field { flex: 1; min-width: 0; }
 
   .section-label {
     font-size: 0.7rem;
@@ -143,13 +145,13 @@
     color: var(--sky);
     text-transform: uppercase;
     letter-spacing: 0.07em;
-    margin: 22px 0 4px;
+    margin: 22px 0 10px;
   }
   .section-label:first-of-type { margin-top: 0; }
 
-  button {
+  button.btn {
     width: 100%;
-    margin-top: 24px;
+    margin-top: 10px;
     padding: 15px;
     border: none;
     border-radius: 8px;
@@ -160,22 +162,68 @@
     font-weight: 700;
     cursor: pointer;
   }
-  button:hover { background: #2d8dd4; }
+  button.btn:hover { background: #2d8dd4; }
+  button.btn:disabled { opacity: 0.6; cursor: default; }
 
-  .result { margin-top: 20px; padding: 20px; border-radius: 10px; display: none; }
-  .result.show { display: block; }
-  .result.ok { background: var(--sky-light); border: 1.5px solid #BFE0F7; }
-  .result.err { background: #FBEAE8; border: 1.5px solid #F0BDB6; }
+  .step { display: none; }
+  .step.active { display: block; }
 
-  .price-note { font-size: 0.75rem; color: var(--slate); }
-  .price {
+  .step-back {
+    display: inline-block;
+    font-size: 0.8rem;
+    color: var(--slate);
+    text-decoration: none;
+    margin-bottom: 16px;
+    cursor: pointer;
+  }
+  .step-back:hover { color: var(--navy); }
+
+  /* ---- Step 2: service explanation card ---- */
+  .service-visual {
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 100%);
+    border-radius: 12px;
+    padding: 28px 20px;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  .service-visual .icon-row { font-size: 2.2rem; margin-bottom: 6px; }
+  .service-visual .service-name {
     font-family: 'Sora', sans-serif;
-    font-size: 2rem;
+    color: var(--white);
+    font-weight: 700;
+    font-size: 1.1rem;
+  }
+
+  .service-list { list-style: none; margin: 0 0 20px; padding: 0; }
+  .service-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 0.88rem;
+    color: var(--navy);
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .service-list li:last-child { border-bottom: none; }
+  .service-list li .tick { color: var(--green); flex-shrink: 0; }
+
+  .price-block {
+    text-align: center;
+    padding: 18px 0 6px;
+    border-top: 1.5px dashed var(--border);
+    margin-top: 4px;
+  }
+  .price-block .price-label { font-size: 0.75rem; color: var(--slate); text-transform: uppercase; letter-spacing: 0.06em; }
+  .price-block .price-value {
+    font-family: 'Sora', sans-serif;
+    font-size: 2.2rem;
     font-weight: 700;
     color: var(--navy);
     margin: 4px 0 2px;
   }
-  .err-text { font-size: 0.875rem; color: var(--red); line-height: 1.5; }
+  .price-block .price-note { font-size: 0.75rem; color: var(--slate); margin-bottom: 12px; }
+
+  .err-text { font-size: 0.875rem; color: var(--red); line-height: 1.5; margin-top: 10px; }
 
   .disclaimer {
     text-align: center;
@@ -204,44 +252,101 @@
 <div class="wrap">
   <div class="eyebrow">Instant pricing</div>
   <h1>Get your parking price</h1>
-  <p class="sub" id="pageSub">Select your airport, dates and times for an instant quote.</p>
+  <p class="sub" id="pageSub">Select your airport and travel details for an instant quote.</p>
 
   <div class="card">
 
     <!-- STEP 1: Quote -->
     <div class="step active" id="step1">
-      <label for="terminal">Airport</label>
-      <select id="terminal">
-        <option value="235">Heathrow — Terminal 2</option>
-        <option value="235">Heathrow — Terminal 3</option>
-        <option value="4">Heathrow — Terminal 4</option>
-        <option value="235">Heathrow — Terminal 5</option>
-      </select>
 
-      <label for="dropoffDT">Drop-off Date & Time</label>
-      <input type="datetime-local" id="dropoffDT" />
+      <div class="field">
+        <label class="field-label" for="airport">Airport</label>
+        <div class="field-box">
+          <select id="airport">
+            <option value="LHR">Heathrow (LHR)</option>
+          </select>
+          <span class="field-icon">✈️</span>
+        </div>
+      </div>
 
-      <label for="pickupDT">Pick-up Date & Time</label>
-      <input type="datetime-local" id="pickupDT" />
-      <p class="price-note" style="margin-top:6px;">Drop-offs and collections are available between 04:30 and 23:30.</p>
+      <div class="field">
+        <label class="field-label" for="terminal">Terminal</label>
+        <div class="field-box">
+          <select id="terminal">
+            <option value="235">Terminal 2</option>
+            <option value="235">Terminal 3</option>
+            <option value="4">Terminal 4</option>
+            <option value="235">Terminal 5</option>
+          </select>
+          <span class="field-icon">✈️</span>
+        </div>
+      </div>
 
-      <button id="calcBtn" type="button">Get Quote</button>
+      <div class="field-row-2">
+        <div class="field">
+          <label class="field-label" for="dropoffDate">Drop-off Date</label>
+          <div class="field-box">
+            <input type="date" id="dropoffDate" />
+            <span class="field-icon">📅</span>
+          </div>
+        </div>
+        <div class="field">
+          <label class="field-label" for="dropoffTime">Drop-off Time</label>
+          <div class="field-box">
+            <input type="time" id="dropoffTime" />
+            <span class="field-icon">🕐</span>
+          </div>
+        </div>
+      </div>
 
-      <div id="resultErr" class="err-text" style="display:none; margin-top:16px;"></div>
+      <div class="field-row-2">
+        <div class="field">
+          <label class="field-label" for="returnDate">Return Date</label>
+          <div class="field-box">
+            <input type="date" id="returnDate" />
+            <span class="field-icon">📅</span>
+          </div>
+        </div>
+        <div class="field">
+          <label class="field-label" for="returnTime">Return Time</label>
+          <div class="field-box">
+            <input type="time" id="returnTime" />
+            <span class="field-icon">🕐</span>
+          </div>
+        </div>
+      </div>
+
+      <p class="disclaimer" style="margin-top:4px; margin-bottom:12px;">Drop-offs and collections are available between 04:30 and 23:30.</p>
+
+      <button id="calcBtn" class="btn" type="button">Get Quotes!</button>
+
+      <div id="resultErr" class="err-text" style="display:none;"></div>
     </div>
 
-    <!-- STEP 2: Confirm rate -->
+    <!-- STEP 2: Service explanation & price -->
     <div class="step" id="step2">
-      <a class="step-back" id="backTo1">← Back to change dates</a>
-      <div class="price-note">Your quoted price</div>
-      <div class="price" id="priceOut">£0</div>
-      <div class="price-note" style="margin-bottom:16px;">Fully inclusive — no hidden fees.</div>
+      <a class="step-back" id="backTo1">← Back to change details</a>
 
-      <div class="summary-row"><span class="label">Airport</span><span class="value" id="sumAirport"></span></div>
-      <div class="summary-row"><span class="label">Drop-off</span><span class="value" id="sumDropoff"></span></div>
-      <div class="summary-row"><span class="label">Pick-up</span><span class="value" id="sumPickup"></span></div>
+      <div class="service-visual">
+        <div class="icon-row">🤝🚗</div>
+        <div class="service-name">Meet & Greet Parking — Heathrow</div>
+      </div>
 
-      <button id="confirmRateBtn" type="button" style="margin-top:20px;">Accept price & continue</button>
+      <ul class="service-list">
+        <li><span class="tick">✔</span> Meet & Greet parking, all terminals</li>
+        <li><span class="tick">✔</span> Price includes all airport access charges</li>
+        <li><span class="tick">✔</span> Drive straight to departures, hand over your keys — no shuttle bus</li>
+        <li><span class="tick">✔</span> Your car is collected from the secure compound and waiting for you at arrivals</li>
+        <li><span class="tick">✔</span> Fully transparent price — no hidden fees</li>
+      </ul>
+
+      <div class="price-block">
+        <div class="price-label">Your price</div>
+        <div class="price-value" id="priceOut">£0</div>
+        <div class="price-note">Fully inclusive — no hidden fees.</div>
+      </div>
+
+      <button id="confirmRateBtn" class="btn" type="button">Book Now!</button>
     </div>
 
     <!-- STEP 3: Your details -->
@@ -249,31 +354,82 @@
       <a class="step-back" id="backTo2">← Back to price</a>
 
       <div class="section-label">Customer Details</div>
-      <label for="custName">Full name</label>
-      <input type="text" id="custName" placeholder="Jane Smith" />
-      <label for="email">Email</label>
-      <input type="email" id="email" placeholder="you@example.com" />
-      <label for="custPhone">Phone</label>
-      <input type="tel" id="custPhone" placeholder="07700 900000" />
+      <div class="field-row-2">
+        <div class="field">
+          <label class="field-label" for="custName">Name</label>
+          <div class="field-box">
+            <input type="text" id="custName" placeholder="Enter name" />
+            <span class="field-icon">👤</span>
+          </div>
+        </div>
+        <div class="field">
+          <label class="field-label" for="email">Email</label>
+          <div class="field-box">
+            <input type="email" id="email" placeholder="Enter email" />
+            <span class="field-icon">✉️</span>
+          </div>
+        </div>
+      </div>
+      <div class="field">
+        <label class="field-label" for="custPhone">Phone</label>
+        <div class="field-box">
+          <input type="tel" id="custPhone" placeholder="Enter phone" />
+          <span class="field-icon">📞</span>
+        </div>
+      </div>
 
       <div class="section-label">Vehicle Details</div>
-      <label for="vehicleReg">Vehicle registration</label>
-      <input type="text" id="vehicleReg" placeholder="e.g. AB12 CDE" style="text-transform:uppercase;" />
-      <label for="vehicleComments">Comments (optional)</label>
-      <textarea id="vehicleComments" placeholder="e.g. colour, make/model, any existing damage"></textarea>
+      <div class="field">
+        <label class="field-label" for="vehicleReg">Registration</label>
+        <div class="field-box">
+          <input type="text" id="vehicleReg" placeholder="Enter vehicle registration" style="text-transform:uppercase;" />
+          <span class="field-icon">🚗</span>
+        </div>
+      </div>
+      <div class="field">
+        <label class="field-label" for="vehicleComments">Comments</label>
+        <div class="field-box">
+          <textarea id="vehicleComments" placeholder="Enter comments (colour, make/model, any existing damage)"></textarea>
+          <span class="field-icon" style="top:18px; transform:none;">💬</span>
+        </div>
+      </div>
 
       <div class="section-label">Flight Details</div>
-      <label for="returnTerminal">Return terminal</label>
-      <select id="returnTerminal">
-        <option value="Terminal 2">Terminal 2</option>
-        <option value="Terminal 3">Terminal 3</option>
-        <option value="Terminal 4">Terminal 4</option>
-        <option value="Terminal 5">Terminal 5</option>
-      </select>
-      <label for="returnFlight">Return flight number</label>
-      <input type="text" id="returnFlight" placeholder="e.g. BA123" style="text-transform:uppercase;" />
+      <div class="field-row-2">
+        <div class="field">
+          <label class="field-label" for="departureTerminal">Departure Terminal</label>
+          <div class="field-box">
+            <select id="departureTerminal">
+              <option value="Terminal 2">Terminal 2</option>
+              <option value="Terminal 3">Terminal 3</option>
+              <option value="Terminal 4">Terminal 4</option>
+              <option value="Terminal 5">Terminal 5</option>
+            </select>
+            <span class="field-icon">🛫</span>
+          </div>
+        </div>
+        <div class="field">
+          <label class="field-label" for="returnTerminal">Return Terminal</label>
+          <div class="field-box">
+            <select id="returnTerminal">
+              <option value="Terminal 2">Terminal 2</option>
+              <option value="Terminal 3">Terminal 3</option>
+              <option value="Terminal 4">Terminal 4</option>
+              <option value="Terminal 5">Terminal 5</option>
+            </select>
+            <span class="field-icon">🛬</span>
+          </div>
+        </div>
+      </div>
+      <div class="field">
+        <label class="field-label" for="returnFlight">Return Flight</label>
+        <div class="field-box">
+          <input type="text" id="returnFlight" placeholder="Enter return flight" style="text-transform:uppercase;" />
+          <span class="field-icon">✈️</span>
+        </div>
+      </div>
 
-      <button id="payBtn" type="button" style="margin-top:24px;">Pay now & confirm booking</button>
+      <button id="payBtn" class="btn" type="button" style="margin-top:20px;">Pay now & confirm booking</button>
       <div id="payError" style="display:none; margin-top:10px; font-size:0.85rem; color:#C0392B;"></div>
     </div>
 
@@ -313,31 +469,30 @@ function getBand(dateObj, terminalGroup) {
   return calendar[day][month] || null;
 }
 
+function isWithinOperatingHours(timeStr) {
+  // Operator doesn't take drop-offs or collections before 04:30 or after 23:30.
+  if (!timeStr) return false;
+  const [h, m] = timeStr.split(":").map(Number);
+  const minutes = h * 60 + m;
+  return minutes >= 4 * 60 + 30 && minutes <= 23 * 60 + 30;
+}
+
 function calculate() {
   const terminal = document.getElementById("terminal").value;
   const terminalLabelText = document.getElementById("terminal").selectedOptions[0].textContent;
-  const dropoffDTVal = document.getElementById("dropoffDT").value;
-  const pickupDTVal = document.getElementById("pickupDT").value;
+  const dropoffDateVal = document.getElementById("dropoffDate").value;
+  const dropoffTimeVal = document.getElementById("dropoffTime").value;
+  const returnDateVal = document.getElementById("returnDate").value;
+  const returnTimeVal = document.getElementById("returnTime").value;
 
   const errBox = document.getElementById("resultErr");
   errBox.style.display = "none";
 
-  if (!dropoffDTVal) { showError("Please select your drop-off date & time."); return; }
-  if (!pickupDTVal) { showError("Please select your pick-up date & time."); return; }
+  if (!dropoffDateVal) { showError("Please select your drop-off date."); return; }
+  if (!dropoffTimeVal) { showError("Please select your drop-off time."); return; }
+  if (!returnDateVal) { showError("Please select your return date."); return; }
+  if (!returnTimeVal) { showError("Please select your return time."); return; }
 
-  // datetime-local values look like "2026-07-05T14:30"
-  const [dropoffVal, dropoffTimeVal] = dropoffDTVal.split("T");
-  const [pickupDateVal, returnTimeVal] = pickupDTVal.split("T");
-
-  const dropoffDateTime = new Date(dropoffDTVal);
-  const pickupDateTime = new Date(pickupDTVal);
-
-  if (pickupDateTime <= dropoffDateTime) {
-    showError("Your pick-up date & time must be after your drop-off date & time.");
-    return;
-  }
-
-  // The operator doesn't take drop-offs or collections outside 04:30–23:30.
   if (!isWithinOperatingHours(dropoffTimeVal)) {
     showError("Sorry, drop-offs aren't available before 04:30 or after 23:30. Please choose a different time.");
     return;
@@ -347,12 +502,20 @@ function calculate() {
     return;
   }
 
+  const dropoffDateTime = new Date(`${dropoffDateVal}T${dropoffTimeVal}`);
+  const returnDateTime = new Date(`${returnDateVal}T${returnTimeVal}`);
+
+  if (returnDateTime <= dropoffDateTime) {
+    showError("Your return date & time must be after your drop-off date & time.");
+    return;
+  }
+
   // Days is the number of calendar days spanned, rounded up so a booking
   // that runs even slightly into the next day counts as another day.
   const msPerDay = 1000 * 60 * 60 * 24;
-  const days = Math.ceil((pickupDateTime - dropoffDateTime) / msPerDay) || 1;
+  const days = Math.ceil((returnDateTime - dropoffDateTime) / msPerDay) || 1;
 
-  const dropoffDate = new Date(dropoffVal + "T00:00:00");
+  const dropoffDate = new Date(dropoffDateVal + "T00:00:00");
   const band = getBand(dropoffDate, terminal);
 
   if (!band) {
@@ -372,20 +535,17 @@ function calculate() {
   window._lastBooking = {
     terminal,
     terminalLabelText,
-    dropoff: dropoffVal,
+    dropoff: dropoffDateVal,
     dropoffTime: dropoffTimeVal,
     days,
     returnTime: returnTimeVal,
-    dropoffDT: dropoffDTVal,
-    pickupDT: pickupDTVal,
     price,
   };
 
-  // Populate the confirm-rate step with a readable summary
   document.getElementById("priceOut").textContent = "£" + price;
-  document.getElementById("sumAirport").textContent = terminalLabelText;
-  document.getElementById("sumDropoff").textContent = formatDT(dropoffDTVal);
-  document.getElementById("sumPickup").textContent = formatDT(pickupDTVal);
+
+  // Pre-fill Step 3's departure terminal to match what was chosen in Step 1
+  document.getElementById("departureTerminal").value = terminalLabelText;
 
   goToStep(2);
 
@@ -395,31 +555,13 @@ function calculate() {
   }
 }
 
-function isWithinOperatingHours(timeStr) {
-  // timeStr is "HH:MM". Operator doesn't take drop-offs or collections
-  // before 04:30 or after 23:30.
-  if (!timeStr) return false;
-  const [h, m] = timeStr.split(":").map(Number);
-  const minutes = h * 60 + m;
-  const earliestMinutes = 4 * 60 + 30;  // 04:30
-  const latestMinutes = 23 * 60 + 30;   // 23:30
-  return minutes >= earliestMinutes && minutes <= latestMinutes;
-}
-
-function formatDT(dtLocalVal) {
-  const d = new Date(dtLocalVal);
-  const datePart = d.toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short" });
-  const timePart = d.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
-  return `${datePart}, ${timePart}`;
-}
-
 function goToStep(stepNum) {
   document.querySelectorAll(".step").forEach((el) => el.classList.remove("active"));
   document.getElementById("step" + stepNum).classList.add("active");
 
   const subtitles = {
-    1: "Select your airport, dates and times for an instant quote.",
-    2: "Review your price before entering your details.",
+    1: "Select your airport and travel details for an instant quote.",
+    2: "Here's what's included in your booking.",
     3: "Just a few details so we can confirm your booking.",
   };
   document.getElementById("pageSub").textContent = subtitles[stepNum];
@@ -490,23 +632,19 @@ document.getElementById("payBtn").addEventListener("click", payNow);
 document.getElementById("backTo1").addEventListener("click", () => goToStep(1));
 document.getElementById("backTo2").addEventListener("click", () => goToStep(2));
 
-// Default drop-off to now, and pick-up to 7 days from now, so the fields
-// aren't empty on first load — matches the "pre-filled" feel of most
-// booking widgets while still being fully editable.
-(function setDefaultDateTimes() {
+// Default drop-off to today, return to 7 days later, so fields aren't empty on load
+(function setDefaults() {
   const pad = (n) => String(n).padStart(2, "0");
-  const toLocalInputValue = (d) =>
-    `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
-
   const now = new Date();
-  now.setMinutes(0, 0, 0);
-  now.setHours(now.getHours() + 1);
+  const inOneWeek = new Date(now);
+  inOneWeek.setDate(inOneWeek.getDate() + 7);
 
-  const oneWeekLater = new Date(now);
-  oneWeekLater.setDate(oneWeekLater.getDate() + 7);
+  const toDateVal = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 
-  document.getElementById("dropoffDT").value = toLocalInputValue(now);
-  document.getElementById("pickupDT").value = toLocalInputValue(oneWeekLater);
+  document.getElementById("dropoffDate").value = toDateVal(now);
+  document.getElementById("dropoffTime").value = "09:00";
+  document.getElementById("returnDate").value = toDateVal(inOneWeek);
+  document.getElementById("returnTime").value = "09:00";
 })();
 </script>
 
