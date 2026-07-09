@@ -47,6 +47,7 @@ exports.handler = async (event) => {
       try {
         await sendConfirmationEmail({
           to: customerEmail,
+          bookingRef: meta.bookingRef,
           terminalLabel: meta.terminalLabel || 'your terminal',
           dropoff: meta.dropoff,
           dropoffTime: meta.dropoffTime,
@@ -73,6 +74,7 @@ exports.handler = async (event) => {
     try {
       await createCalendarEvent({
         customerEmail,
+        bookingRef: meta.bookingRef,
         terminalLabel: meta.terminalLabel || 'Unknown terminal',
         dropoff: meta.dropoff,
         dropoffTime: meta.dropoffTime,
@@ -97,7 +99,7 @@ exports.handler = async (event) => {
 };
 
 async function sendConfirmationEmail({
-  to, terminalLabel, dropoff, dropoffTime, days, returnTime, priceGBP,
+  to, bookingRef, terminalLabel, dropoff, dropoffTime, days, returnTime, priceGBP,
   customerName, customerPhone, vehicleReg, vehicleComments, returnTerminal, returnFlight,
 }) {
   const formattedDropoffDate = dropoff
@@ -123,11 +125,16 @@ async function sendConfirmationEmail({
 
   const firstName = (customerName || '').trim().split(' ')[0];
   const greetingName = firstName ? `, ${escapeHtml(firstName)}` : '';
+  const refDisplay = bookingRef || 'N/A';
 
   const html = `
     <div style="font-family: Arial, sans-serif; max-width: 480px; margin: 0 auto; color: #0B1E3D;">
       <h1 style="font-size: 1.4rem; margin-bottom: 4px;">Booking confirmed ✅</h1>
       <p style="color: #6B7A8D; margin-top: 0;">Thanks for booking with Airwise Parking${greetingName}.</p>
+      <p style="background: #EBF5FD; border-radius: 8px; padding: 10px 14px; font-size: 0.9rem; margin: 12px 0;">
+        Booking reference: <strong>${escapeHtml(refDisplay)}</strong><br/>
+        <span style="color: #6B7A8D; font-size: 0.8rem;">Please quote this if you need to contact us about your booking.</span>
+      </p>
 
       <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
         <tr>
@@ -200,7 +207,10 @@ async function sendConfirmationEmail({
     body: JSON.stringify({
       from: 'Airwise Parking <info@airwiseparking.co.uk>',
       to: [to],
-      subject: 'Your Airwise Parking booking is confirmed',
+      // BCC'd to our own inbox so every confirmation is searchable later
+      // (e.g. by booking reference) without needing a separate database.
+      bcc: ['info@airwiseparking.co.uk'],
+      subject: `Your Airwise Parking booking is confirmed — Ref ${refDisplay}`,
       html,
     }),
   });
@@ -275,7 +285,7 @@ async function getGoogleAccessToken() {
 }
 
 async function createCalendarEvent({
-  customerEmail, terminalLabel, dropoff, dropoffTime, days, returnTime, priceGBP,
+  customerEmail, bookingRef, terminalLabel, dropoff, dropoffTime, days, returnTime, priceGBP,
   customerName, customerPhone, vehicleReg, vehicleComments, returnTerminal, returnFlight,
 }) {
   if (!dropoff || !days) {
@@ -294,8 +304,10 @@ async function createCalendarEvent({
   // still gets created rather than failing outright.
   const safeDropoffTime = dropoffTime || '09:00';
   const safeReturnTime = returnTime || '09:00';
+  const refDisplay = bookingRef || 'N/A';
 
   const descriptionLines = [
+    `Booking ref: ${refDisplay}`,
     `Terminal: ${terminalLabel}`,
     `Drop-off: ${dropoff} ${safeDropoffTime}`,
     `Return: ${returnDate} ${safeReturnTime}`,
@@ -314,7 +326,7 @@ async function createCalendarEvent({
   }
 
   const event = {
-    summary: `Airwise Booking — ${terminalLabel} — ${customerName || customerEmail || 'no name'} — ${vehicleReg || 'no reg'}`,
+    summary: `[${refDisplay}] ${terminalLabel} — ${customerName || customerEmail || 'no name'} — ${vehicleReg || 'no reg'}`,
     description: descriptionLines.join('\n'),
     start: {
       dateTime: `${dropoff}T${safeDropoffTime}:00`,

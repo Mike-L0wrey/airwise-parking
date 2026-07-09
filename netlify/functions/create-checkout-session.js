@@ -9,6 +9,25 @@
 
 const Stripe = require('stripe');
 const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
+const crypto = require('crypto');
+
+// Generates a booking reference like AWP-260710-K3F9
+// (AWP = Airwise Parking, then today's date, then 4 random characters).
+// This becomes the shared reference across Stripe, the confirmation email,
+// the calendar event, and the operator's invoice — one code to search by.
+function generateBookingRef() {
+  const now = new Date();
+  const yy = String(now.getUTCFullYear()).slice(2);
+  const mm = String(now.getUTCMonth() + 1).padStart(2, '0');
+  const dd = String(now.getUTCDate()).padStart(2, '0');
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // no ambiguous chars like 0/O, 1/I
+  let suffix = '';
+  const randomBytes = crypto.randomBytes(4);
+  for (let i = 0; i < 4; i++) {
+    suffix += chars[randomBytes[i] % chars.length];
+  }
+  return `AWP-${yy}${mm}${dd}-${suffix}`;
+}
 
 const RATES = {
   E1: [80,110,130,145,160,180,205,220,240,270,285,295,310,325,340],
@@ -47,7 +66,7 @@ exports.handler = async (event) => {
   const {
     terminal, dropoff, dropoffTime, days, returnTime, customerEmail,
     customerName, customerPhone, vehicleReg, vehicleComments,
-    returnTerminal, returnFlight,
+    returnTerminal, returnFlight, gdprConsent,
   } = body;
   const numDays = parseInt(days, 10);
 
@@ -81,6 +100,10 @@ exports.handler = async (event) => {
     return { statusCode: 400, body: JSON.stringify({ error: 'Please fill in all required customer, vehicle, and flight details.' }) };
   }
 
+  if (gdprConsent !== true) {
+    return { statusCode: 400, body: JSON.stringify({ error: 'Please confirm you agree to your data being shared and processed before continuing.' }) };
+  }
+
   const dropoffDate = new Date(dropoff + 'T00:00:00Z');
   if (isNaN(dropoffDate.getTime())) {
     return { statusCode: 400, body: JSON.stringify({ error: 'Invalid date.' }) };
@@ -103,18 +126,22 @@ exports.handler = async (event) => {
   const amountPence = Math.round(priceGBP * 100);
   const terminalLabel = terminal === '4' ? 'Terminal 4' : 'Terminal 2/3/5';
   const siteUrl = process.env.URL || 'https://airwiseparking.co.uk';
+  const bookingRef = generateBookingRef();
 
   try {
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
       payment_method_types: ['card'],
       customer_email: customerEmail || undefined,
+      // Lets us find this booking in the Stripe dashboard by searching
+      // the reference number directly.
+      client_reference_id: bookingRef,
       line_items: [
         {
           price_data: {
             currency: 'gbp',
             product_data: {
-              name: `Airwise Parking — ${terminalLabel} — ${numDays} day(s) from ${dropoff} ${dropoffTime}`,
+              name: `Airwise Parking [${bookingRef}] — ${terminalLabel} — ${numDays} day(s) from ${dropoff} ${dropoffTime}`,
             },
             unit_amount: amountPence,
           },
@@ -125,6 +152,7 @@ exports.handler = async (event) => {
       // once payment succeeds, to send the confirmation email and create
       // the timed calendar event.
       metadata: {
+        bookingRef,
         terminal,
         terminalLabel,
         dropoff,
@@ -138,6 +166,8 @@ exports.handler = async (event) => {
         vehicleComments: (vehicleComments || '').slice(0, 490),
         returnTerminal: returnTerminal || '',
         returnFlight,
+        gdprConsentGiven: 'true',
+        gdprConsentAt: new Date().toISOString(),
       },
       success_url: `${siteUrl}/quote.html?payment=success`,
       cancel_url: `${siteUrl}/quote.html?payment=cancelled`,
