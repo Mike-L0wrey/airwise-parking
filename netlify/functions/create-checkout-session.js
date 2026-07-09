@@ -66,7 +66,7 @@ exports.handler = async (event) => {
   const {
     terminal, dropoff, dropoffTime, days, returnTime, customerEmail,
     customerName, customerPhone, vehicleReg, vehicleComments,
-    returnTerminal, returnFlight, gdprConsent,
+    departureTerminal, returnTerminal, returnFlight, gdprConsent,
   } = body;
   const numDays = parseInt(days, 10);
 
@@ -96,7 +96,7 @@ exports.handler = async (event) => {
     return { statusCode: 400, body: JSON.stringify({ error: "Collections aren't available before 04:30 or after 23:30." }) };
   }
 
-  if (!customerName || !customerPhone || !vehicleReg || !returnFlight) {
+  if (!customerName || !customerPhone || !vehicleReg || !returnFlight || !departureTerminal) {
     return { statusCode: 400, body: JSON.stringify({ error: 'Please fill in all required customer, vehicle, and flight details.' }) };
   }
 
@@ -124,7 +124,10 @@ exports.handler = async (event) => {
 
   const priceGBP = rateTable[numDays - 1];
   const amountPence = Math.round(priceGBP * 100);
-  const terminalLabel = terminal === '4' ? 'Terminal 4' : 'Terminal 2/3/5';
+  // Note: departureTerminal is the actual specific terminal the customer
+  // picked, and is what we display and send to the operator — this is the
+  // important fix: previously the email/calendar showed the generic pricing
+  // group ("Terminal 2/3/5") instead of the customer's real choice.
   const siteUrl = process.env.URL || 'https://airwiseparking.co.uk';
   const bookingRef = generateBookingRef();
 
@@ -141,7 +144,7 @@ exports.handler = async (event) => {
           price_data: {
             currency: 'gbp',
             product_data: {
-              name: `Airwise Parking [${bookingRef}] — ${terminalLabel} — ${numDays} day(s) from ${dropoff} ${dropoffTime}`,
+              name: `Airwise Parking [${bookingRef}] — ${departureTerminal} — ${numDays} day(s) from ${dropoff} ${dropoffTime}`,
             },
             unit_amount: amountPence,
           },
@@ -154,7 +157,7 @@ exports.handler = async (event) => {
       metadata: {
         bookingRef,
         terminal,
-        terminalLabel,
+        terminalLabel: departureTerminal,
         dropoff,
         dropoffTime,
         days: String(numDays),

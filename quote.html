@@ -585,10 +585,11 @@ async function payNow() {
   const custName = document.getElementById("custName").value.trim();
   const email = document.getElementById("email").value.trim();
   const custPhone = document.getElementById("custPhone").value.trim();
-  const vehicleReg = document.getElementById("vehicleReg").value.trim();
+  const vehicleReg = document.getElementById("vehicleReg").value.trim().toUpperCase();
   const vehicleComments = document.getElementById("vehicleComments").value.trim();
+  const departureTerminal = document.getElementById("departureTerminal").value;
   const returnTerminal = document.getElementById("returnTerminal").value;
-  const returnFlight = document.getElementById("returnFlight").value.trim();
+  const returnFlight = document.getElementById("returnFlight").value.trim().toUpperCase();
   const gdprConsent = document.getElementById("gdprConsent").checked;
 
   if (!custName) { payError.textContent = "Please enter your name."; payError.style.display = "block"; return; }
@@ -616,6 +617,7 @@ async function payNow() {
         customerPhone: custPhone,
         vehicleReg,
         vehicleComments,
+        departureTerminal,
         returnTerminal,
         returnFlight,
         gdprConsent,
