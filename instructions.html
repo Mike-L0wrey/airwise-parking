@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Drop-off & Collection Instructions | Airwise Parking</title>
+<meta name="color-scheme" content="light" />
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png" />
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png" />
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png" />
+<link rel="icon" href="favicon.ico" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --navy: #0B1E3D;
+    --navy-mid: #122A52;
+    --sky: #3B9EE8;
+    --sky-light: #EBF5FD;
+    --white: #FFFFFF;
+    --slate: #6B7A8D;
+    --slate-light: #F5F7FA;
+    --border: #DDE3EC;
+    --green: #1DB87A;
+    --red: #C0392B;
+    --amber: #B7791F;
+    --amber-light: #FDF3E3;
+  }
+
+  html { scroll-behavior: smooth; color-scheme: light; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    color: var(--navy);
+    background: var(--slate-light);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 48px;
+    background: var(--navy);
+  }
+  .logo { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 1.25rem; color: var(--white); text-decoration: none; }
+  .logo span { color: var(--sky); }
+  nav a { color: rgba(255,255,255,0.75); text-decoration: none; font-size: 0.875rem; font-weight: 500; }
+  nav a:hover { color: var(--white); }
+
+  .wrap { max-width: 720px; margin: 0 auto; padding: 48px 24px 80px; }
+
+  .eyebrow {
+    font-size: 0.75rem; font-weight: 600; color: var(--sky);
+    text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px;
+  }
+  h1 { font-family: 'Sora', sans-serif; font-size: 1.9rem; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 10px; }
+  .sub { color: var(--slate); font-size: 0.95rem; margin-bottom: 28px; line-height: 1.6; }
+
+  .card {
+    background: var(--white); border-radius: 14px; padding: 26px 24px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.04), 0 12px 32px rgba(11,30,61,0.06);
+    margin-bottom: 20px;
+  }
+
+  .important-box {
+    background: var(--amber-light);
+    border: 1.5px solid #F0DCB4;
+    border-radius: 10px;
+    padding: 16px 18px;
+    font-size: 0.88rem;
+    line-height: 1.6;
+    color: #6B4E1A;
+    margin: 14px 0;
+  }
+  .important-box strong { color: var(--amber); }
+
+  .contact-box {
+    background: var(--sky-light);
+    border: 1.5px solid #BFE0F7;
+    border-radius: 10px;
+    padding: 16px 18px;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    margin-bottom: 20px;
+  }
+  .contact-box a { color: var(--sky); font-weight: 600; text-decoration: none; }
+
+  .toc {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+  .toc a {
+    display: block;
+    text-align: center;
+    background: var(--sky-light);
+    color: var(--navy);
+    font-family: 'Sora', sans-serif;
+    font-weight: 600;
+    font-size: 0.9rem;
+    padding: 12px;
+    border-radius: 8px;
+    text-decoration: none;
+    border: 1.5px solid transparent;
+  }
+  .toc a:hover { border-color: var(--sky); }
+
+  h2.terminal-title {
+    font-family: 'Sora', sans-serif;
+    font-size: 1.3rem;
+    color: var(--navy);
+    padding: 20px 0 4px;
+    scroll-margin-top: 20px;
+  }
+
+  h3.section-heading {
+    font-family: 'Sora', sans-serif;
+    font-size: 0.95rem;
+    color: var(--sky);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin: 18px 0 8px;
+  }
+
+  .postcode-box {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--slate-light);
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-size: 0.88rem;
+    margin-bottom: 12px;
+  }
+  .postcode-box strong { font-family: 'Sora', sans-serif; }
+
+  p.instruction { font-size: 0.92rem; line-height: 1.7; color: #333; margin-bottom: 10px; }
+
+  .divider { border: none; border-top: 1.5px solid var(--border); margin: 28px 0; }
+
+  .back-link { display: inline-block; margin-bottom: 20px; font-size: 0.85rem; color: var(--slate); text-decoration: none; }
+  .back-link:hover { color: var(--navy); }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="logo">Air<span>wise</span></a>
+  <a href="index.html">← Back to home</a>
+</nav>
+
+<div class="wrap">
+  <a class="back-link" href="index.html">← Back to home</a>
+  <div class="eyebrow">Drop-off &amp; collection</div>
+  <h1>Your instructions for the day</h1>
+  <p class="sub">Full step-by-step directions for dropping off and collecting your car at Heathrow, provided by our operator. Please read the section for your terminal carefully — it covers exactly where to go and what to expect.</p>
+
+  <div class="contact-box">
+    <strong>Running early or late?</strong> Your booking time is fixed, so please call at least 20 minutes before your scheduled time to check availability: <a href="tel:07530500009">07530 500009</a> (please call — do not text or leave a voicemail).
+  </div>
+
+  <div class="card">
+    <h3 class="section-heading">Jump to your terminal</h3>
+    <div class="toc">
+      <a href="#terminal-2">Terminal 2</a>
+      <a href="#terminal-3">Terminal 3</a>
+      <a href="#terminal-4">Terminal 4</a>
+      <a href="#terminal-5">Terminal 5</a>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3 class="section-heading">Before you go</h3>
+    <p class="instruction">Please note your parking booking time refers to your <strong>vehicle drop-off time</strong>, not your flight departure time.</p>
+    <p class="instruction">A late fee may apply if you don't arrive at your booked time — a grace period of 30–45 minutes is typically allowed, but please call ahead if you think you'll be early or late.</p>
+    <p class="instruction">Before handing over your vehicle, please make sure it's roadworthy, taxed, and has a current MOT if applicable. Cars with tyres below 1.6mm tread cannot be accepted for collection.</p>
+    <div class="important-box">
+      <strong>Sat-nav postcodes are approximate.</strong> Once you're on the airport approach roads, follow the signs for your terminal's short-stay car park rather than relying solely on GPS.
+    </div>
+  </div>
+
+  <!-- TERMINAL 2 -->
+  <div class="card" id="terminal-2">
+    <h2 class="terminal-title">Terminal 2</h2>
+
+    <h3 class="section-heading">Drop-off</h3>
+    <div class="postcode-box">📍 Sat-nav: <strong>TW6 1EW</strong> (Short Stay Car Park 2) — height limit 2.05m</div>
+    <p class="instruction">After passing through the main tunnel, continue following signs for Terminal 2. Stay in the right-hand lanes and merge onto the ramp, keeping right for short-stay passenger pick-up.</p>
+    <p class="instruction">At the car park barriers, drive to barrier number 6 in the far right-hand lane. Take a ticket and enter on Level 4.</p>
+    <p class="instruction">Follow signs for "Off Airport Parking Meet &amp; Greet" and the one-way arrows to rows A and B, where our representative will meet you.</p>
+
+    <h3 class="section-heading">Return / collection</h3>
+    <p class="instruction">Once you've collected your last bag from the belt, call <a href="tel:07530500009">07530 500009</a>.</p>
+    <p class="instruction">Pick up your car on Level 4, Zone A or B, in the short-stay car park.</p>
+    <div class="important-box">
+      <strong>Please collect your car within 15 minutes</strong> of it arriving at the car park — it'll be delivered as soon as you make your clearance call. Charges incurred beyond this are your responsibility.
+    </div>
+  </div>
+
+  <!-- TERMINAL 3 -->
+  <div class="card" id="terminal-3">
+    <h2 class="terminal-title">Terminal 3</h2>
+
+    <h3 class="section-heading">Drop-off</h3>
+    <div class="postcode-box">📍 Sat-nav: <strong>TW6 1QG</strong> (Short Stay Car Park 3) — height limit 2.2m</div>
+    <p class="instruction">Upon exiting the tunnel, stay in the left-hand lane and follow signs for Terminal 3 departures. As you pass the Hilton Garden Hotel at the bend, stay right and follow signs for short-stay passenger pick-up.</p>
+    <p class="instruction">Collect a ticket at the barriers and proceed to Level 4 via the spiral. Park in Zone A/B towards the end of the car park, where our meet and greet points are located.</p>
+    <div class="important-box">
+      During peak hours the collection/drop-off point may change due to queues — meeting on the forecourt instead avoids extra waiting, but carries a £5 levy fee payable to Heathrow Airport Limited via the airport's website.
+    </div>
+
+    <h3 class="section-heading">Return / collection</h3>
+    <p class="instruction">Once you've collected your last bag from the belt, call <a href="tel:07530500009">07530 500009</a>.</p>
+    <p class="instruction">Pick up your car on Level 4 of the Terminal 3 short-stay car park. After exiting arrivals, head towards Café Nero, take the lift opposite to Level 1, walk across the bridge to the pay station, then retake the lifts to Level 4. Cars are delivered at Zone A or B.</p>
+    <div class="important-box">
+      <strong>Please collect your car within 15 minutes</strong> of it arriving at the car park — it'll be delivered as soon as you make your clearance call. Charges incurred beyond this are your responsibility.
+    </div>
+  </div>
+
+  <!-- TERMINAL 4 -->
+  <div class="card" id="terminal-4">
+    <h2 class="terminal-title">Terminal 4</h2>
+
+    <h3 class="section-heading">Drop-off</h3>
+    <div class="postcode-box">📍 Sat-nav: <strong>TW6 3XA</strong> (Short Stay Car Park 3) — height limit 2.2m</div>
+    <p class="instruction">Follow signs for Terminal 4 Departures. As you approach the terminal on the ramp, stay in the right-hand lane and continue following signs for short-stay passenger pick-up.</p>
+    <p class="instruction">Drive down to Level 2, Zone F, where our meet and greet points are located. A professional chauffeur will approach you and identify themselves with our Star Parking paperwork.</p>
+
+    <h3 class="section-heading">Return / collection</h3>
+    <p class="instruction">Once you've collected your last bag from the belt, call <a href="tel:07530500009">07530 500009</a>.</p>
+    <p class="instruction">Pick up your car on Level 2 of the Terminal 4 short-stay car park. Exit the terminal building using the exit next to WH Smith, cross the first four lanes, turn left past the payment machine, then take the lift to Level 2.</p>
+    <div class="important-box">
+      <strong>Please collect your car within 15 minutes</strong> of it arriving at the car park — it'll be delivered as soon as you make your clearance call. Charges incurred beyond this are your responsibility.
+    </div>
+  </div>
+
+  <!-- TERMINAL 5 -->
+  <div class="card" id="terminal-5">
+    <h2 class="terminal-title">Terminal 5</h2>
+
+    <h3 class="section-heading">Drop-off</h3>
+    <div class="postcode-box">📍 Sat-nav: <strong>TW6 2GA</strong> (Short Stay Car Park 5) — height limit 2.2m</div>
+    <p class="instruction">At the main roundabout, proceed straight towards the ramp, following the "Short Stay and Passenger Pick Up" sign to the right.</p>
+    <p class="instruction">Pass under the height restriction arm keeping left, follow the "Avis/Budget car" sign, and pass through the purple canopy before entering the car park.</p>
+    <p class="instruction">At the barriers, take a ticket and drive down to rows R &amp; S, where our representative will meet you.</p>
+
+    <h3 class="section-heading">Return / collection</h3>
+    <p class="instruction">Once you've collected your last bag from the belt, call <a href="tel:07530500009">07530 500009</a>.</p>
+    <p class="instruction">In the arrivals hall, head towards Café Nero (the red pillar marked as the South meeting point). Exit the arrivals building and take the lifts — not the one next to Café Nero — up to Level 4.</p>
+    <div class="important-box">
+      <strong>Please collect your car within 15 minutes</strong> of it arriving at the car park — it'll be delivered as soon as you make your clearance call. Charges incurred beyond this are your responsibility.
+    </div>
+  </div>
+
+  <hr class="divider" />
+
+  <div class="card">
+    <h3 class="section-heading">A few important notes for every terminal</h3>
+    <p class="instruction">We track the return flight number you gave us at booking, so please make sure it's correct — an incorrect flight number can cause delays returning your vehicle, even if your return time was right.</p>
+    <p class="instruction">Vehicle collection or flight delays after 23:30 are subject to an additional fee of £20 per hour. Any outstanding payments must be settled before your vehicle is released.</p>
+    <p class="instruction">During peak times, your car may need to take an approximate 20-mile round trip to and from the secure compound as part of normal operations.</p>
+  </div>
+
+  <p style="text-align:center; font-size:0.85rem; color:var(--slate); margin-top: 20px;">
+    Questions? Call us on <a href="tel:02045690803" style="color:var(--sky);">02045690803</a> or email
+    <a href="mailto:info@airwiseparking.co.uk" style="color:var(--sky);">info@airwiseparking.co.uk</a>
+  </p>
+</div>
+
+</body>
+</html>

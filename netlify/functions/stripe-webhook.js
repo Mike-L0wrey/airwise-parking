@@ -127,6 +127,12 @@ async function sendConfirmationEmail({
   const greetingName = firstName ? `, ${escapeHtml(firstName)}` : '';
   const refDisplay = bookingRef || 'N/A';
 
+  // Builds an anchor link straight to this customer's terminal section on
+  // instructions.html (e.g. "Terminal 3" -> "#terminal-3"). Falls back to
+  // no anchor (top of the page) if the terminal number can't be matched.
+  const terminalMatch = (terminalLabel || '').match(/(\d)/);
+  const terminalAnchor = terminalMatch ? `#terminal-${terminalMatch[1]}` : '';
+
   const html = `
     <div style="font-family: Arial, sans-serif; max-width: 480px; margin: 0 auto; color: #0B1E3D;">
       <h1 style="font-size: 1.4rem; margin-bottom: 4px;">Booking confirmed ✅</h1>
@@ -184,11 +190,17 @@ async function sendConfirmationEmail({
         ${vehicleComments ? `<tr><td style="padding: 6px 0; color: #6B7A8D;">Vehicle notes</td><td style="padding: 6px 0; text-align: right;">${escapeHtml(vehicleComments)}</td></tr>` : ''}
       </table>
 
-      <h3 style="font-size: 1rem; margin-bottom: 4px;">What happens next</h3>
-      <p style="color: #333; line-height: 1.6;">
-        On your drop-off date, drive to departures at your drop-off time and hand your keys
-        to our operator's team — they'll take your car straight to the secure compound.
-        At your return time, it'll be ready and waiting for you at arrivals.
+      <h3 style="font-size: 1rem; margin-bottom: 4px;">Drop-off &amp; collection instructions</h3>
+      <p style="color: #333; line-height: 1.6; margin-bottom: 14px;">
+        Full step-by-step directions for your terminal — where to go, sat-nav details, and what
+        happens on your return — are here:
+      </p>
+      <p style="margin-bottom: 20px;">
+        <a href="https://airwiseparking.co.uk/instructions.html${terminalAnchor}"
+           style="display: inline-block; background: #3B9EE8; color: #FFFFFF; text-decoration: none;
+                  padding: 12px 22px; border-radius: 8px; font-weight: bold; font-size: 0.9rem;">
+          View my instructions →
+        </a>
       </p>
 
       <p style="color: #6B7A8D; font-size: 0.85rem; margin-top: 24px;">

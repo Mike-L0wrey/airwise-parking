@@ -156,7 +156,8 @@
   }
   .section-label:first-of-type { margin-top: 0; }
 
-  button.btn {
+  button.btn, a.btn {
+    display: block;
     width: 100%;
     margin-top: 10px;
     padding: 15px;
@@ -168,8 +169,11 @@
     font-size: 1rem;
     font-weight: 700;
     cursor: pointer;
+    box-sizing: border-box;
+    text-align: center;
+    text-decoration: none;
   }
-  button.btn:hover { background: #2d8dd4; }
+  button.btn:hover, a.btn:hover { background: #2d8dd4; }
   button.btn:disabled { opacity: 0.6; cursor: default; }
 
   .step { display: none; }
@@ -259,6 +263,30 @@
 </nav>
 
 <div class="wrap">
+
+  <!-- POST-PAYMENT: Booking confirmed -->
+  <div class="card" id="bookingConfirmed" style="display:none; text-align:center;">
+    <div style="font-size:2.6rem; margin-bottom:6px;">✅</div>
+    <h1 style="margin-bottom:10px;">Booking confirmed!</h1>
+    <p style="color:var(--slate); font-size:0.95rem; line-height:1.6; margin-bottom:20px;">
+      Thanks for booking with Airwise Parking. We've sent a confirmation email with your booking reference and full details — please keep hold of it.
+    </p>
+    <a href="instructions.html" class="btn">View drop-off &amp; collection instructions</a>
+    <a href="index.html" style="display:block; margin-top:14px; font-size:0.85rem; color:var(--slate); text-decoration:none;">← Back to home</a>
+  </div>
+
+  <!-- POST-PAYMENT: Payment cancelled -->
+  <div class="card" id="bookingCancelled" style="display:none; text-align:center;">
+    <div style="font-size:2.6rem; margin-bottom:6px;">↩️</div>
+    <h1 style="margin-bottom:10px;">No charge was made</h1>
+    <p style="color:var(--slate); font-size:0.95rem; line-height:1.6; margin-bottom:20px;">
+      Your payment was cancelled before it completed, so nothing has been charged. You can get a new quote whenever you're ready.
+    </p>
+    <a href="quote.html" class="btn">Get a new quote</a>
+  </div>
+
+  <!-- NORMAL QUOTE FLOW -->
+  <div id="quoteFlow">
   <div class="eyebrow">Instant pricing</div>
   <h1>Get your parking price</h1>
   <p class="sub" id="pageSub">Select your airport and travel details for an instant quote.</p>
@@ -610,6 +638,7 @@
     Prefer to talk? Call <a href="tel:02045690803">02045690803</a> or
     email <a href="mailto:info@airwiseparking.co.uk">info@airwiseparking.co.uk</a>
   </p>
+  </div>
 </div>
 
 <script>
@@ -820,6 +849,21 @@ document.getElementById("backTo2").addEventListener("click", () => goToStep(2));
   document.getElementById("dropoffTime").value = "09:00";
   document.getElementById("returnDate").value = toDateVal(inOneWeek);
   document.getElementById("returnTime").value = "09:00";
+})();
+
+// If the customer has just come back from Stripe, show the right screen
+// instead of the normal quote form.
+(function handlePaymentResult() {
+  const params = new URLSearchParams(window.location.search);
+  const result = params.get("payment");
+
+  if (result === "success") {
+    document.getElementById("quoteFlow").style.display = "none";
+    document.getElementById("bookingConfirmed").style.display = "block";
+  } else if (result === "cancelled") {
+    document.getElementById("quoteFlow").style.display = "none";
+    document.getElementById("bookingCancelled").style.display = "block";
+  }
 })();
 </script>
 
