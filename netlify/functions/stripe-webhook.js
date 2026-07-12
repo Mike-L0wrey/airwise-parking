@@ -454,6 +454,10 @@ async function appendBookingRow({
     notes,
   ];
 
+  if (!sheetId) {
+    throw new Error('GOOGLE_SHEET_ID environment variable is missing or empty');
+  }
+
   // Range is anchored at row 4, where the real header row lives
   // (rows 1-3 are a title and an instructions note, not data).
   // Sheets appends after the last row of the table it detects
@@ -472,8 +476,14 @@ async function appendBookingRow({
     }
   );
 
+  const responseBody = await response.text();
+
   if (!response.ok) {
-    const errText = await response.text();
-    throw new Error(`Google Sheets API error: ${errText}`);
+    throw new Error(`Google Sheets API error (status ${response.status}): ${responseBody}`);
   }
+
+  // Log the exact range Google wrote to, so we can confirm it landed
+  // where expected (e.g. "Bookings Log!A6:N6"). Safe to keep long-term —
+  // useful confirmation, not sensitive data.
+  console.log('Booking row appended to Google Sheet:', responseBody);
 }
