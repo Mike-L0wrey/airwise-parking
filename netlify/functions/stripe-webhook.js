@@ -458,16 +458,34 @@ async function appendBookingRow({
     throw new Error('GOOGLE_SHEET_ID environment variable is missing or empty');
   }
 
-  // Range is anchored at row 4, where the real header row lives
-  // (rows 1-3 are a title and an instructions note, not data).
-  // Sheets appends after the last row of the table it detects
-  // starting from this header row.
-  const range = encodeURIComponent('Bookings Log!A4:N');
-
-  const response = await fetch(
-    `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS`,
+  // Instead of asking Google's "append" endpoint to guess where the table
+  // is (its auto-detection can anchor on unrelated data elsewhere in the
+  // sheet), we work out the exact next empty row ourselves by reading
+  // column A, then write directly to that row. This is fully deterministic.
+  const columnARange = encodeURIComponent('Bookings Log!A:A');
+  const readResponse = await fetch(
+    `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${columnARange}`,
     {
-      method: 'POST',
+      headers: { Authorization: `Bearer ${accessToken}` },
+    }
+  );
+
+  if (!readResponse.ok) {
+    const errText = await readResponse.text();
+    throw new Error(`Google Sheets API error reading column A (status ${readResponse.status}): ${errText}`);
+  }
+
+  const readData = await readResponse.json();
+  const columnAValues = readData.values || [];
+  // Header row is row 4, so data starts at row 5 at the earliest.
+  // The next empty row is one past the last row that has any value.
+  const nextRow = Math.max(columnAValues.length + 1, 5);
+
+  const writeRange = encodeURIComponent(`Bookings Log!A${nextRow}:N${nextRow}`);
+  const response = await fetch(
+    `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${writeRange}?valueInputOption=USER_ENTERED`,
+    {
+      method: 'PUT',
       headers: {
         Authorization: `Bearer ${accessToken}`,
         'Content-Type': 'application/json',
@@ -482,8 +500,5 @@ async function appendBookingRow({
     throw new Error(`Google Sheets API error (status ${response.status}): ${responseBody}`);
   }
 
-  // Log the exact range Google wrote to, so we can confirm it landed
-  // where expected (e.g. "Bookings Log!A6:N6"). Safe to keep long-term —
-  // useful confirmation, not sensitive data.
-  console.log('Booking row appended to Google Sheet:', responseBody);
+  console.log('Booking row written to Google Sheet at row', nextRow, ':', responseBody);
 }
