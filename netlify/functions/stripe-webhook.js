@@ -93,6 +93,27 @@ exports.handler = async (event) => {
       // or affect the customer. We just log it so it can be checked.
       console.error('Failed to create calendar event:', err.message);
     }
+
+    try {
+      await appendBookingRow({
+        bookingRef: meta.bookingRef,
+        terminalLabel: meta.terminalLabel || 'Unknown terminal',
+        dropoff: meta.dropoff,
+        dropoffTime: meta.dropoffTime,
+        days: meta.days,
+        returnTime: meta.returnTime,
+        priceGBP: meta.priceGBP,
+        customerName: meta.customerName,
+        vehicleReg: meta.vehicleReg,
+        returnTerminal: meta.returnTerminal,
+        returnFlight: meta.returnFlight,
+      });
+    } catch (err) {
+      // Same principle again — if the sheet write fails, it shouldn't
+      // block the webhook or affect the customer. Logged so it can be
+      // checked and the row added manually if needed.
+      console.error('Failed to append booking to Google Sheet:', err.message);
+    }
   }
 
   return { statusCode: 200, body: JSON.stringify({ received: true }) };
@@ -135,7 +156,8 @@ async function sendConfirmationEmail({
 
   const html = `
     <div style="font-family: Arial, sans-serif; max-width: 480px; margin: 0 auto; color: #0B1E3D;">
-      <h1 style="font-size: 1.4rem; margin-bottom: 4px;">Booking confirmed ✅</h1>
+      <div style="width: 44px; height: 44px; border-radius: 50%; background: #EBF5FD; border: 2px solid #3B9EE8; text-align: center; line-height: 40px; font-size: 1.2rem; color: #3B9EE8; margin: 0 0 14px;">&#10003;</div>
+      <h1 style="font-size: 1.4rem; margin-bottom: 4px;">Booking confirmed</h1>
       <p style="color: #6B7A8D; margin-top: 0;">Thanks for booking with Airwise Parking${greetingName}.</p>
       <p style="background: #EBF5FD; border-radius: 8px; padding: 10px 14px; font-size: 0.9rem; margin: 12px 0;">
         Booking reference: <strong>${escapeHtml(refDisplay)}</strong><br/>
@@ -263,7 +285,7 @@ async function getGoogleAccessToken() {
   const header = { alg: 'RS256', typ: 'JWT' };
   const claims = {
     iss: clientEmail,
-    scope: 'https://www.googleapis.com/auth/calendar',
+    scope: 'https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/spreadsheets',
     aud: 'https://oauth2.googleapis.com/token',
     iat: nowSeconds,
     exp: nowSeconds + 3600,
@@ -365,5 +387,93 @@ async function createCalendarEvent({
   if (!response.ok) {
     const errText = await response.text();
     throw new Error(`Google Calendar API error: ${errText}`);
+  }
+}
+
+// ---- Google Sheets integration (bookkeeping auto-sync) ----
+//
+// Appends one row to the "Bookings Log" tab every time a payment succeeds,
+// using the same service account/access token as the Calendar integration
+// above. Column order must exactly match the sheet's header row:
+//
+// Booking Ref | Date Booked | Customer Name | Terminal | Drop-off Date |
+// Drop-off Time | Return Date | Return Time | Days | Gross Amount (£) |
+// Referral Fee 25% (£) | Paid to Operator (£) | Payment Status | Notes
+
+async function appendBookingRow({
+  bookingRef, terminalLabel, dropoff, dropoffTime, days, returnTime, priceGBP,
+  customerName, vehicleReg, returnTerminal, returnFlight,
+}) {
+  if (!dropoff || !days) {
+    throw new Error('Missing dropoff or days, cannot append booking row');
+  }
+
+  const accessToken = await getGoogleAccessToken();
+  const sheetId = process.env.GOOGLE_SHEET_ID;
+
+  // Work out the return date from dropoff + days (same logic used
+  // elsewhere in this file, kept consistent for the sheet).
+  const returnDateObj = new Date(dropoff + 'T00:00:00Z');
+  returnDateObj.setUTCDate(returnDateObj.getUTCDate() + parseInt(days, 10));
+  const returnDate = returnDateObj.toISOString().slice(0, 10);
+
+  // UK date formatting (DD/MM/YYYY) to match how the sheet is used.
+  const toUkDate = (isoDate) =>
+    new Date(isoDate + 'T00:00:00Z').toLocaleDateString('en-GB', {
+      timeZone: 'UTC',
+    });
+
+  const dateBooked = new Date().toLocaleDateString('en-GB', {
+    timeZone: 'Europe/London',
+  });
+
+  const gross = parseFloat(priceGBP) || 0;
+  const referralFee = Math.round(gross * 0.25 * 100) / 100;
+  const paidToOperator = Math.round((gross - referralFee) * 100) / 100;
+
+  const noteParts = [];
+  if (vehicleReg) noteParts.push(`Reg: ${vehicleReg}`);
+  if (returnTerminal) noteParts.push(`Return terminal: ${returnTerminal}`);
+  if (returnFlight) noteParts.push(`Return flight: ${returnFlight}`);
+  const notes = noteParts.join(' | ');
+
+  const row = [
+    bookingRef || 'N/A',
+    dateBooked,
+    customerName || '',
+    terminalLabel || '',
+    toUkDate(dropoff),
+    dropoffTime || '',
+    toUkDate(returnDate),
+    returnTime || '',
+    days || '',
+    gross.toFixed(2),
+    referralFee.toFixed(2),
+    paidToOperator.toFixed(2),
+    'Paid',
+    notes,
+  ];
+
+  // Range is anchored at row 4, where the real header row lives
+  // (rows 1-3 are a title and an instructions note, not data).
+  // Sheets appends after the last row of the table it detects
+  // starting from this header row.
+  const range = encodeURIComponent('Bookings Log!A4:N');
+
+  const response = await fetch(
+    `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS`,
+    {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ values: [row] }),
+    }
+  );
+
+  if (!response.ok) {
+    const errText = await response.text();
+    throw new Error(`Google Sheets API error: ${errText}`);
   }
 }
